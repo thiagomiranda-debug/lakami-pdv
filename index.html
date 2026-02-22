@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAKAMI PRO - Painel Cloud</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ESTILOS DA TELA */
+body{margin:0;font-family:'Roboto',sans-serif;background:#f4f6f8;color:#333}
+header{background:linear-gradient(90deg,#7c3aed,#d946ef);color:#fff;padding:20px;text-align:center;font-size:26px;font-weight:700}
+.container{max-width:1400px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,.05);transition:.3s}
+.card:hover{box-shadow:0 6px 25px rgba(0,0,0,.1)}
+input,select,button{padding:10px;margin:5px 0;width:100%;box-sizing:border-box;border-radius:6px;border:1px solid #ccc; font-family:inherit;}
+button{background:#7c3aed;color:#fff;border:none;cursor:pointer;transition:0.2s;font-weight:500}
+button:hover{background:#6b21a8}
+button:disabled{background:#94a3b8; cursor:not-allowed;}
+button.danger{background:#ef4444;}
+button.danger:hover{background:#dc2626;}
+button.success{background:#10b981;}
+button.success:hover{background:#059669;}
+button.print{background:#475569;}
+button.print:hover{background:#334155;}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+th,td{padding:12px 10px;border-bottom:1px solid #ddd;text-align:left}
+th{background:#f3f3f3}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:20px}
+.box{padding:20px;border-radius:10px;text-align:center;color:#fff;font-weight:700;transition:.3s;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.box span{font-size:22px;margin-top:8px}
+#investimento{background:#f59e0b} 
+#valorEstoque{background:#6366f1} 
+#receitas{background:#8b5cf6} 
+#vendasAReceber{background:#0284c7}
+#despesas{background:#ef4444} 
+#lucro{background:#10b981} 
+#margem{background:#14b8a6}
+.hidden{display:none !important}
+.alert{background:#facc15;color:#000;font-weight:bold;border-radius:6px;padding:4px 8px;text-align:center;font-size:11px; margin-left: 10px; display:inline-block;}
+.flex{display:flex;gap:10px;flex-wrap:wrap; align-items:center;}
+.flex input, .flex select{flex:1; min-width: 150px;}
+.flex button {width: auto; padding: 10px 20px;}
+.carrinho-table th, .carrinho-table td{text-align:center;}
+.total-carrinho{font-weight:700;text-align:center;font-size:22px; color: #7c3aed; margin-bottom: 15px;}
+.card-title{font-size:18px;font-weight:700;margin-bottom:15px; border-bottom: 2px solid #f4f6f8; padding-bottom: 10px; display:flex; justify-content:space-between; align-items:center;}
+.acoes-btn {display: flex; gap: 5px; align-items: center;}
+.acoes-btn button {padding: 6px 10px; font-size: 12px; margin: 0;}
+
+/* ESTILOS DE IMPRESSÃO (CUPOM / PDF) */
+#reciboImpressao { display: none; }
+@media print {
+    body * { visibility: hidden; }
+    body { background: #fff; margin: 0; padding: 0; }
+    #reciboImpressao, #reciboImpressao * { visibility: visible; }
+    #reciboImpressao { 
+        position: absolute; left: 0; top: 0; width: 100%; max-width: 300px;
+        margin: 0 auto; font-family: 'Courier New', Courier, monospace; font-size: 14px; color: #000; display: block;
+    }
+    .cupom-header { text-align: center; margin-bottom: 10px; }
+    .cupom-header h2 { margin: 0; font-size: 22px; font-weight: bold; }
+    .cupom-header p { margin: 2px 0; font-size: 12px; }
+    .cupom-body { margin-bottom: 10px; }
+    .cupom-body p { margin: 4px 0; }
+    .cupom-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;}
+    .cupom-table th, .cupom-table td { border-bottom: 1px dashed #000; padding: 4px 0; text-align: left; font-size: 13px; }
+    .cupom-table th:last-child, .cupom-table td:last-child { text-align: right; }
+    .cupom-footer { text-align: justify; font-size: 11px; border-top: 1px dashed #000; padding-top: 10px; }
+    .cupom-footer .thanks { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px;}
+}
+</style>
+</head>
+<body>
+
+<div id="reciboImpressao"></div>
+
+<header>LAKAMI PRO - Cloud PDV</header>
+<div class="container">
+
+<div id="loginBox" class="card" style="max-width: 400px; margin: 50px auto;">
+<h3 class="card-title" style="text-align: center;">Acesso ao Sistema Cloud</h3>
+<input type="text" id="user" placeholder="Usuário">
+<input type="password" id="pass" placeholder="Senha">
+<button id="btnLogin" onclick="login()">Entrar e Sincronizar</button>
+<p id="loginMsg" style="font-size: 12px; color: #10b981; text-align:center; font-weight:bold;"></p>
+</div>
+
+<div id="sistema" class="hidden">
+
+<div class="card">
+<h3 class="card-title">Resumo Financeiro <span id="statusCloud" style="font-size:12px; background:#dcfce7; color:#166534; padding:4px 10px; border-radius:12px;">Nuvem Online 🟢</span></h3>
+<div class="grid">
+<div class="box" id="investimento">Custo do Estoque<span>R$ 0,00</span></div>
+<div class="box" id="valorEstoque">Venda Projetada<span>R$ 0,00</span></div>
+<div class="box" id="receitas">Vendas Recebidas<span>R$ 0,00</span></div>
+<div class="box" id="vendasAReceber">Vendas a Receber<span>R$ 0,00</span></div>
+<div class="box" id="despesas">Despesas<span>R$ 0,00</span></div>
+<div class="box" id="lucro">Lucro Líquido<span>R$ 0,00</span></div>
+<div class="box" id="margem">Margem Global<span>0%</span></div>
+</div>
+</div>
+
+<div class="card">
+<h3 class="card-title">Gestão de Produtos</h3>
+<div class="flex">
+<input id="nomeProd" placeholder="Nome do Produto">
+<select id="tamProd"></select>
+<input id="compraProd" type="number" step="0.01" placeholder="Custo (R$)">
+<input id="vendaProd" type="number" step="0.01" placeholder="Venda (R$)">
+<input id="qtdProd" type="number" placeholder="Estoque Atual">
+<button id="btnAddProd" onclick="addProduto()">Salvar Produto</button>
+</div>
+<table style="margin-top: 15px;">
+<thead><tr><th>Produto</th><th>Tam</th><th>Estoque</th><th>Custo Unit.</th><th>Preço Venda</th><th>Ações</th></tr></thead>
+<tbody id="listaProd"></tbody>
+</table>
+</div>
+
+<div class="flex" style="gap: 20px;">
+    <div class="card" style="flex: 1; min-width: 300px;">
+        <h3 class="card-title">Clientes</h3>
+        <div class="flex">
+        <input id="clienteNome" placeholder="Nome do Cliente">
+        <input id="clienteTel" placeholder="Telefone/WhatsApp">
+        <button id="btnAddCliente" onclick="addCliente()">Salvar</button>
+        </div>
+        <table>
+        <thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead>
+        <tbody id="listaClientes"></tbody>
+        </table>
+    </div>
+
+    <div class="card" style="flex: 1; min-width: 300px;">
+        <h3 class="card-title">Fornecedores</h3>
+        <div class="flex">
+        <input id="fornNome" placeholder="Nome da Empresa">
+        <input id="fornContato" placeholder="Contato">
+        <button id="btnAddForn" onclick="addFornecedor()">Salvar</button>
+        </div>
+        <table>
+        <thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead>
+        <tbody id="listaFornecedores"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="card-title">Histórico de Compras de Mercadorias (Isolado)</h3>
+    <div class="flex">
+        <input type="date" id="dataNovaCompra" title="Data da Compra">
+        <input type="text" id="empresaCompra" placeholder="Empresa/Fornecedor">
+        <input type="number" id="valorCompra" step="0.01" placeholder="Valor Produtos (R$)">
+        <input type="number" id="qtdPecasCompra" placeholder="Qtd de Peças">
+        <input type="number" id="freteCompra" step="0.01" placeholder="Frete (R$)">
+        <select id="pagCompra"><option value="PIX">PIX</option><option value="Cartão">Cartão</option></select>
+        <button onclick="addHistoricoCompra()">Registrar Compra</button>
+    </div>
+    <table style="margin-top: 15px;">
+    <thead><tr><th>Data</th><th>Empresa</th><th>Peças</th><th>Valor Prod.</th><th>Frete</th><th>Total da Nota</th><th>Pagamento</th><th>Ações</th></tr></thead>
+    <tbody id="listaHistoricoCompras"></tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h3 class="card-title">Despesas Operacionais</h3>
+    <div class="flex">
+    <input id="descDespesa" placeholder="Descrição (ex: Embalagens, Aluguel)">
+    <input id="valorDespesa" type="number" step="0.01" placeholder="Valor (R$)">
+    <button id="btnAddDesp" onclick="addDespesa()">Registrar Despesa</button>
+    </div>
+    <table>
+    <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
+    <tbody id="listaDespesas"></tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h3 class="card-title">Ponto de Venda (PDV)</h3>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        
+        <div style="flex: 2; min-width: 300px;">
+            <div class="flex">
+                <select id="selectProd" style="flex: 3;"><option value="">Selecione o Produto...</option></select>
+                <input id="qtdVenda" type="number" placeholder="Qtd" min="1" value="1" style="flex: 1; max-width: 80px; text-align: center;">
+                <button onclick="addCarrinho()">Inserir</button>
+            </div>
+            <table class="carrinho-table" style="margin-top: 15px;">
+                <thead><tr><th>Produto</th><th>Qtd</th><th>Unitário</th><th>Subtotal</th><th>Ações</th></tr></thead>
+                <tbody id="carrinho"></tbody>
+            </table>
+        </div>
+
+        <div style="flex: 1; min-width: 280px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px;">
+            <div class="total-carrinho" id="totalCarrinho">Total: R$ 0,00</div>
+            
+            <label style="font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: -5px;">Cliente</label>
+            <select id="selectCliente"><option value="">Cliente Padrão (Avulso)</option></select>
+            
+            <label style="font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: -5px;">Forma de Pagamento</label>
+            <select id="formaPag" onchange="tratarRegrasPagamento()">
+                <option value="PIX">PIX</option>
+                <option value="À vista (Dinheiro)">À vista (Dinheiro)</option>
+                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                <option value="Cartão de Débito">Cartão de Débito</option>
+                <option value="Prazo">A Prazo / Fiado</option>
+            </select>
+            
+            <div id="boxDesconto" style="display: flex; flex-direction: column; gap: 5px;">
+                <label style="font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: -5px;">Desconto Liberado (%)</label>
+                <input type="number" id="valorDesconto" placeholder="Ex: 5" min="0" max="100" value="0" oninput="atualizarCarrinho()" style="border-color: #10b981;">
+            </div>
+
+            <input type="date" id="dataPrazo" class="hidden">
+            <button onclick="finalizarVenda()" style="background: #10b981; font-size: 16px; padding: 15px; margin-top: 15px;">Finalizar Venda</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+<h3 class="card-title">Histórico de Vendas</h3>
+<table>
+<thead><tr><th>Data</th><th>Produto</th><th>Cliente</th><th>Qtd</th><th>Total</th><th>Situação</th><th>Ações</th></tr></thead>
+<tbody id="listaVendas"></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAHwt8eGsCv2dnKAYQa0iaqWoHyGxl5V14",
+  authDomain: "lakami-pro.firebaseapp.com",
+  projectId: "lakami-pro",
+  storageBucket: "lakami-pro.firebasestorage.app",
+  messagingSenderId: "966421239270",
+  appId: "1:966421239270:web:60d9b7c79ba700c515f227"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+const el = (id) => document.getElementById(id);
+
+// Preenche tamanhos
+const tamSelect = el("tamProd");
+tamSelect.innerHTML = `<option value="">Tamanho...</option><option value="Único">Único</option>`;
+for(let i = 1; i <= 12; i++){ tamSelect.innerHTML += `<option value="${i}">${i}</option>`; }
+
+// Bancos de Dados Locais (sincronizados com Firebase)
+let produtos = [], clientes = [], fornecedores = [], vendas = [], despesas = [], historicoCompras = [], carrinhoArr = [];
+let editProdId=null, editCliId=null;
+
+// FUNÇÕES DE SINCRONIZAÇÃO (NUVEM)
+async function puxarDadosNuvem() {
+    try {
+        const fetchCol = async (nome) => {
+            const snap = await getDocs(collection(db, nome));
+            return snap.docs.map(d => d.data());
+        };
+        produtos = await fetchCol("produtos");
+        clientes = await fetchCol("clientes");
+        fornecedores = await fetchCol("fornecedores");
+        vendas = await fetchCol("vendas");
+        despesas = await fetchCol("despesas");
+        historicoCompras = await fetchCol("historicoCompras");
+    } catch(e) {
+        alert("Erro ao conectar no banco de dados. Verifique a internet.");
+        console.error(e);
+    }
+}
+
+async function salvarItemFirebase(colecao, item) {
+    try { await setDoc(doc(db, colecao, item.id.toString()), item); } 
+    catch(e) { console.error("Erro ao salvar:", e); }
+}
+
+async function deletarItemFirebase(colecao, id) {
+    try { await deleteDoc(doc(db, colecao, id.toString())); } 
+    catch(e) { console.error("Erro ao deletar:", e); }
+}
+
+// LOGIN & INICIALIZAÇÃO ASSÍNCRONA
+window.login = async function(){
+    if(el("user").value==="admin" && el("pass").value==="1234"){ 
+        el("btnLogin").disabled = true;
+        el("loginMsg").innerText = "Sincronizando banco de dados na nuvem... Aguarde.";
+        
+        await puxarDadosNuvem(); // Baixa os dados do Firebase
+        
+        el("loginBox").classList.add("hidden"); 
+        el("sistema").classList.remove("hidden"); 
+        el("dataNovaCompra").valueAsDate = new Date(); 
+        window.tratarRegrasPagamento(); 
+        atualizar(); 
+    } else { alert("Credenciais inválidas."); }
+}
+
+// CRUD PRODUTOS
+window.addProduto = function(){
+    const nome = el("nomeProd").value.trim(); const tam = el("tamProd").value;
+    const compra = parseFloat(el("compraProd").value); const venda = parseFloat(el("vendaProd").value); const qtd = parseInt(el("qtdProd").value);
+    if(!nome || !tam || isNaN(compra) || isNaN(venda) || isNaN(qtd)){ alert("Preencha tudo!"); return; }
+    
+    let prodObj;
+    if(editProdId){ 
+        prodObj = produtos.find(x => x.id == editProdId); 
+        prodObj.nome = nome; prodObj.tam = tam; prodObj.compra = compra; prodObj.venda = venda; prodObj.qtd = qtd; 
+        editProdId = null; el("btnAddProd").innerText = "Salvar Produto";
+    } else { 
+        prodObj = {id: Date.now(), nome, tam, compra, venda, qtd};
+        produtos.push(prodObj); 
+    }
+    
+    salvarItemFirebase("produtos", prodObj); // Sync Otimista
+    el("nomeProd").value=""; el("tamProd").value=""; el("compraProd").value=""; el("vendaProd").value=""; el("qtdProd").value="";
+    atualizar();
+}
+
+window.editarProduto = function(id){ 
+    let p = produtos.find(x => x.id == id); 
+    el("nomeProd").value = p.nome; el("tamProd").value = p.tam; el("compraProd").value = p.compra; el("vendaProd").value = p.venda; el("qtdProd").value = p.qtd; 
+    editProdId = id; el("btnAddProd").innerText = "Atualizar Produto";
+    window.scrollTo({ top: el("nomeProd").offsetTop - 100, behavior: 'smooth' });
+}
+
+window.excluirProduto = function(id){
+    if(confirm("Excluir este produto?")){ 
+        produtos = produtos.filter(x => x.id != id); 
+        deletarItemFirebase("produtos", id);
+        atualizar(); 
+    }
+}
+
+// OUTROS CRUDS (Adaptados para Nuvem)
+window.addHistoricoCompra = function(){
+    const data = el("dataNovaCompra").value; const empresa = el("empresaCompra").value.trim();
+    const valor = parseFloat(el("valorCompra").value); const qtd = parseInt(el("qtdPecasCompra").value);
+    const frete = parseFloat(el("freteCompra").value) || 0; const pagamento = el("pagCompra").value;
+    if(!data || !empresa || isNaN(valor) || isNaN(qtd)){ alert("Preencha tudo."); return; }
+    
+    let obj = {id: Date.now(), data, empresa, valor, qtd, frete, pagamento};
+    historicoCompras.push(obj);
+    salvarItemFirebase("historicoCompras", obj);
+    
+    el("empresaCompra").value = ""; el("valorCompra").value = ""; el("qtdPecasCompra").value = ""; el("freteCompra").value = "";
+    atualizar();
+}
+window.excluirHistoricoCompra = function(id){
+    if(confirm("Excluir registro?")){ historicoCompras = historicoCompras.filter(x => x.id != id); deletarItemFirebase("historicoCompras", id); atualizar(); }
+}
+
+window.addDespesa = function(){
+    const desc = el("descDespesa").value.trim(); const valor = parseFloat(el("valorDespesa").value);
+    if(!desc || isNaN(valor)){ alert("Preencha descrição e valor!"); return; }
+    let obj = { id: Date.now(), data: new Date().toISOString(), descricao: desc, valor: valor };
+    despesas.push(obj);
+    salvarItemFirebase("despesas", obj);
+    el("descDespesa").value = ""; el("valorDespesa").value = ""; atualizar();
+}
+window.excluirDespesa = function(id){
+    if(confirm("Excluir despesa?")){ despesas = despesas.filter(x => x.id != id); deletarItemFirebase("despesas", id); atualizar(); }
+}
+
+window.addCliente = function(){ 
+    const nome = el("clienteNome").value.trim(); if(!nome) return; 
+    let obj;
+    if(editCliId){ 
+        obj=clientes.find(x=>x.id==editCliId); obj.nome=nome; obj.tel=el("clienteTel").value; editCliId=null; el("btnAddCliente").innerText="Salvar"; 
+    } else { 
+        obj = {id:Date.now(), nome, tel:el("clienteTel").value};
+        clientes.push(obj); 
+    }
+    salvarItemFirebase("clientes", obj);
+    el("clienteNome").value=""; el("clienteTel").value=""; atualizar();
+}
+window.editarCliente = function(id){ let c=clientes.find(x=>x.id==id); el("clienteNome").value=c.nome; el("clienteTel").value=c.tel; editCliId=id; el("btnAddCliente").innerText="Atualizar";}
+window.excluirCliente = function(id){ if(confirm("Excluir cliente?")){ clientes=clientes.filter(x=>x.id!=id); deletarItemFirebase("clientes", id); atualizar();}}
+
+window.addFornecedor = function(){ 
+    const nome = el("fornNome").value.trim(); if(!nome) return; 
+    let obj = {id: Date.now(), nome, contato:el("fornContato").value};
+    fornecedores.push(obj); 
+    salvarItemFirebase("fornecedores", obj);
+    el("fornNome").value=""; el("fornContato").value=""; atualizar();
+}
+window.excluirFornecedor = function(id){ if(confirm("Excluir fornecedor?")){ fornecedores=fornecedores.filter(x=>x.id!=id); deletarItemFirebase("fornecedores", id); atualizar();}}
+
+// PDV
+window.tratarRegrasPagamento = function(){ 
+    let forma = el("formaPag").value; let dp = el("dataPrazo"); let boxDesc = el("boxDesconto"); let inputDesc = el("valorDesconto");
+    if(forma === "Prazo") dp.classList.remove("hidden"); else dp.classList.add("hidden");
+    if(forma === "PIX" || forma === "À vista (Dinheiro)"){ boxDesc.style.display = "flex"; } else { boxDesc.style.display = "none"; inputDesc.value = "0"; }
+    window.atualizarCarrinho();
+}
+
+window.addCarrinho = function(){
+    let prodId = el("selectProd").value; let qtd = parseInt(el("qtdVenda").value); 
+    if(!prodId || isNaN(qtd) || qtd < 1){ alert("Selecione um produto e uma quantidade."); return; }
+    let prod = produtos.find(x => x.id == prodId);
+    let existe = carrinhoArr.find(x => x.id == prod.id);
+    let qtdTotalDesejada = existe ? existe.qtd + qtd : qtd;
+    if(qtdTotalDesejada > prod.qtd){ alert(`Estoque insuficiente. Restam apenas ${prod.qtd}.`); return; }
+    
+    if(existe) { existe.qtd += qtd; } else {
+        carrinhoArr.push({id: prod.id, nome: `${prod.nome} (${prod.tam})`, qtd: qtd, venda: prod.venda, compra: prod.compra});
+    }
+    el("qtdVenda").value = "1"; window.atualizarCarrinho();
+}
+
+window.atualizarCarrinho = function(){
+    let tbody = el("carrinho"); tbody.innerHTML = ""; let subtotal = 0;
+    carrinhoArr.forEach((item, i) => {
+        let sub = item.qtd * item.venda; subtotal += sub;
+        tbody.innerHTML += `<tr>
+        <td>${item.nome}</td><td>${item.qtd}</td><td>${formatCurrency(item.venda)}</td><td>${formatCurrency(sub)}</td>
+        <td><button class="danger acoes-btn" onclick="removerCarrinho(${i})">Remover</button></td></tr>`;
+    });
+
+    let descontoPerc = parseFloat(el("valorDesconto").value) || 0; let forma = el("formaPag").value; let totalFinal = subtotal;
+    if(descontoPerc > 0 && (forma === "PIX" || forma === "À vista (Dinheiro)")) {
+        let abatimento = subtotal * (descontoPerc / 100); totalFinal = subtotal - abatimento;
+        el("totalCarrinho").innerHTML = `<div style="font-size: 14px; color: #64748b; text-decoration: line-through;">Subtotal: ${formatCurrency(subtotal)}</div> Total: ${formatCurrency(totalFinal)}`;
+    } else { el("totalCarrinho").innerText = "Total: " + formatCurrency(totalFinal); }
+}
+
+window.removerCarrinho = function(i){ carrinhoArr.splice(i,1); window.atualizarCarrinho(); }
+
+window.finalizarVenda = function(){
+    if(carrinhoArr.length === 0){ alert("Carrinho vazio."); return; }
+    
+    let cliente = el("selectCliente").value; let forma = el("formaPag").value; let dataPrev = el("dataPrazo").value;
+    let descontoPerc = parseFloat(el("valorDesconto").value) || 0;
+    
+    if(forma === "Prazo" && !dataPrev){ alert("Informe a data de vencimento."); return; }
+    if(forma !== "PIX" && forma !== "À vista (Dinheiro)") descontoPerc = 0; 
+    
+    let ultimaVendaId = null;
+
+    carrinhoArr.forEach(item => {
+        let prod = produtos.find(p => p.id == item.id);
+        if(prod) { 
+            prod.qtd -= item.qtd; 
+            salvarItemFirebase("produtos", prod); // Atualiza estoque na nuvem
+        }
+        
+        let totalItemBruto = item.venda * item.qtd;
+        let totalItemComDesconto = totalItemBruto * (1 - (descontoPerc / 100));
+        let custoVenda = item.compra * item.qtd;
+        let margemReal = totalItemComDesconto > 0 ? (((totalItemComDesconto - custoVenda) / totalItemComDesconto) * 100).toFixed(1) : 0;
+        
+        ultimaVendaId = Date.now() + Math.random();
+        
+        let vendaObj = {
+            id: ultimaVendaId, data: new Date().toISOString(), produtoId: item.id, produto: item.nome, 
+            cliente: cliente || "Cliente Avulso", quantidade: item.qtd, total: totalItemComDesconto, 
+            custoHistorico: custoVenda, margem: margemReal, forma: forma, pagamentoPrevisto: dataPrev || null
+        };
+        vendas.push(vendaObj);
+        salvarItemFirebase("vendas", vendaObj); // Salva venda na nuvem
+    });
+    
+    carrinhoArr = []; el("valorDesconto").value = "0"; 
+    window.atualizarCarrinho(); atualizar(); 
+    if(confirm("Venda registrada na nuvem com sucesso! Deseja gerar o recibo agora?")) { window.imprimirRecibo(ultimaVendaId); }
+}
+
+window.darBaixaVenda = function(id) {
+    if(confirm("Confirmar recebimento do pagamento?")){
+        let v = vendas.find(x => x.id == id);
+        if(v) {
+            if(v.forma === "Prazo") v.forma = "Prazo (Recebido)";
+            if(v.forma === "Cartão de Crédito") v.forma = "Cartão de Crédito (Recebido)";
+            salvarItemFirebase("vendas", v); // Atualiza status na nuvem
+            atualizar();
+        }
+    }
+}
+
+window.excluirVenda = function(id){ 
+    if(confirm("Devolver produto ao estoque e cancelar venda na nuvem?")){ 
+        let v = vendas.find(x => x.id == id);
+        if(v) { 
+            let prod = produtos.find(p => p.id == v.produtoId); 
+            if(prod) { prod.qtd += v.quantidade; salvarItemFirebase("produtos", prod); }
+        }
+        vendas = vendas.filter(x => x.id != id); 
+        deletarItemFirebase("vendas", id);
+        atualizar();
+    }
+}
+
+window.imprimirRecibo = function(id) {
+    let v = vendas.find(x => x.id == id);
+    if(!v) return;
+    let d = new Date(v.data);
+    let dataFormatada = `${d.toLocaleDateString()} às ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+    let htmlCupom = `
+        <div class="cupom-header"><h2>LAKAMI</h2><p>Moda Infantil</p><p>@lakami_kids</p><p>WhatsApp: (82) 99381-7564</p></div>
+        <div class="cupom-body">
+            <p><strong>Data:</strong> ${dataFormatada}</p><p><strong>Cliente:</strong> ${v.cliente}</p>
+            <table class="cupom-table"><tr><th>Qtd</th><th>Produto</th><th>Total</th></tr>
+            <tr><td>${v.quantidade}</td><td>${v.produto}</td><td>${formatCurrency(v.total)}</td></tr></table>
+            <p style="text-align:right; font-size: 16px;"><strong>Valor Final:</strong> ${formatCurrency(v.total)}</p>
+            <p><strong>Pagamento:</strong> ${v.forma}</p>
+        </div>
+        <div class="cupom-footer">
+            <p><strong>Política de Troca e Garantia:</strong></p>
+            <p>Conforme CDC, a loja garante a troca por defeito de fabricação em até 90 dias. Por cortesia, realizamos a troca de tamanho ou modelo em até 30 dias, desde que a peça mantenha a etiqueta original afixada, não tenha sido lavada e não apresente indícios de uso.</p>
+            <p class="thanks">Agradecemos a preferência!</p>
+        </div>`;
+    el("reciboImpressao").innerHTML = htmlCupom; window.print();
+}
+
+// ATUALIZAÇÃO DA INTERFACE
+function atualizar(){
+    el("listaProd").innerHTML = ""; el("selectProd").innerHTML = '<option value="">Selecione o Produto...</option>';
+    let investimento = 0; let valorEstoque = 0;
+    
+    produtos.forEach(p => {
+        investimento += p.compra * p.qtd; valorEstoque += p.venda * p.qtd;
+        let alerta = p.qtd < 5 && p.qtd > 0 ? '<span class="alert">Baixo</span>' : (p.qtd === 0 ? '<span class="alert" style="background:#ef4444;color:#fff;">Esgotado</span>' : '');
+        el("listaProd").innerHTML += `<tr>
+        <td>${p.nome} ${alerta}</td><td>${p.tam}</td><td>${p.qtd}</td>
+        <td>${formatCurrency(p.compra)}</td><td>${formatCurrency(p.venda)}</td>
+        <td class="acoes-btn"><button onclick="editarProduto(${p.id})">Editar</button> <button class="danger" onclick="excluirProduto(${p.id})">Excl</button></td></tr>`;
+        if(p.qtd > 0) el("selectProd").innerHTML += `<option value="${p.id}">${p.nome} (${p.tam}) - R$ ${p.venda.toFixed(2)}</option>`;
+    });
+
+    el("listaClientes").innerHTML = ""; el("selectCliente").innerHTML = '<option value="">Cliente Padrão (Avulso)</option>';
+    clientes.forEach(c => {
+        el("listaClientes").innerHTML += `<tr><td>${c.nome}</td><td>${c.tel}</td><td class="acoes-btn"><button onclick="editarCliente(${c.id})">Editar</button> <button class="danger" onclick="excluirCliente(${c.id})">Excl</button></td></tr>`;
+        el("selectCliente").innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+    });
+
+    el("listaFornecedores").innerHTML = "";
+    fornecedores.forEach(f => {
+        el("listaFornecedores").innerHTML += `<tr><td>${f.nome}</td><td>${f.contato}</td><td class="acoes-btn"><button class="danger" onclick="excluirFornecedor(${f.id})">Excl</button></td></tr>`;
+    });
+
+    el("listaHistoricoCompras").innerHTML = "";
+    historicoCompras.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(c => {
+        let totalNota = c.valor + c.frete;
+        let dataSplit = c.data.split('-');
+        let dataFormatada = dataSplit.length === 3 ? `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}` : c.data;
+        el("listaHistoricoCompras").innerHTML += `<tr>
+        <td>${dataFormatada}</td><td>${c.empresa}</td><td>${c.qtd}</td><td>${formatCurrency(c.valor)}</td>
+        <td>${formatCurrency(c.frete)}</td><td style="font-weight:bold; color:#7c3aed;">${formatCurrency(totalNota)}</td>
+        <td><span style="font-size:12px; background:#e2e8f0; padding:3px 6px; border-radius:4px;">${c.pagamento}</span></td>
+        <td><button class="danger" onclick="excluirHistoricoCompra(${c.id})">Remover</button></td></tr>`;
+    });
+
+    el("listaDespesas").innerHTML = ""; let totalDesp = 0;
+    despesas.forEach(d => {
+        totalDesp += d.valor;
+        el("listaDespesas").innerHTML += `<tr>
+        <td>${new Date(d.data).toLocaleDateString()}</td><td>${d.descricao}</td><td>${formatCurrency(d.valor)}</td>
+        <td><button class="danger" onclick="excluirDespesa(${d.id})">Remover</button></td></tr>`;
+    });
+
+    let vendasRecebidas = 0; let vendasAReceber = 0;  let custoVendido = 0;
+    vendas.forEach(v => {
+        if(v.forma === "Prazo" || v.forma === "Cartão de Crédito") vendasAReceber += v.total;
+        else vendasRecebidas += v.total;
+        custoVendido += v.custoHistorico || 0; 
+    });
+    
+    let receitaTotalOperacional = vendasRecebidas + vendasAReceber;
+    let lucro = receitaTotalOperacional - custoVendido - totalDesp;
+    let margem = receitaTotalOperacional > 0 ? ((lucro / receitaTotalOperacional) * 100).toFixed(1) : 0;
+
+    el("investimento").children[0].innerText = formatCurrency(investimento); el("valorEstoque").children[0].innerText = formatCurrency(valorEstoque);
+    el("receitas").children[0].innerText = formatCurrency(vendasRecebidas); el("vendasAReceber").children[0].innerText = formatCurrency(vendasAReceber);
+    el("despesas").children[0].innerText = formatCurrency(totalDesp); el("lucro").children[0].innerText = formatCurrency(lucro); el("margem").children[0].innerText = margem + "%";
+
+    el("listaVendas").innerHTML = "";
+    vendas.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(v => {
+        let d = new Date(v.data);
+        let isPendente = (v.forma === "Prazo" || v.forma === "Cartão de Crédito");
+        let corStatus = isPendente ? "background:#fef08a; color:#854d0e; border: 1px solid #facc15;" : "background:#dcfce7; color:#166534; border: 1px solid #86efac;";
+        
+        let infoPagamento = v.forma;
+        if (v.forma === "Prazo") {
+            let dataVenc = new Date(v.pagamentoPrevisto + 'T12:00:00').toLocaleDateString();
+            infoPagamento = `Prazo (Venc: ${dataVenc})`;
+        }
+
+        let botaoBaixa = isPendente ? `<button class="success" onclick="darBaixaVenda(${v.id})">Dar Baixa</button>` : '';
+
+        el("listaVendas").innerHTML += `<tr>
+        <td>${d.toLocaleDateString()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}</td>
+        <td>${v.produto}</td><td>${v.cliente}</td><td>${v.quantidade}</td><td>${formatCurrency(v.total)}</td>
+        <td><span style="font-size:12px; font-weight: 500; padding:4px 8px; border-radius:4px; ${corStatus}">${infoPagamento}</span></td>
+        <td class="acoes-btn">${botaoBaixa} <button class="print" onclick="imprimirRecibo(${v.id})">📄 Cupom</button> <button class="danger" onclick="excluirVenda(${v.id})">Desfazer</button></td></tr>`;
+    });
+}
+});
+</script>
+</body>
+</html>
