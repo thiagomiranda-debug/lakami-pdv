@@ -11,53 +11,68 @@
 <style>
 :root {
     /* PALETA DE CORES LAKAMI KIDS */
-    --primary: #ff4eb5; /* Rosa Lakami */
+    --primary: #ff4eb5; 
     --primary-hover: #e83ea2;
-    --secondary: #00c7d4; /* Ciano/Azul Fundo Lakami */
-    --bg: #f0f7f8; /* Fundo geral do sistema levemente azulado */
-    --sidebar: #ffffff; /* Menu lateral clean/branco */
-    --text-side: #334155; /* Texto escuro para leitura */
-    --sidebar-active: #fdf2f8; /* Fundo rosa claro no menu ativo */
+    --secondary: #00c7d4; 
+    --bg: #f0f7f8; 
+    --sidebar: #ffffff; 
+    --text-side: #334155; 
+    --sidebar-active: #fdf2f8; 
 }
+
 body { margin:0; font-family:'Roboto',sans-serif; background:var(--bg); color:#333; display: flex; min-height: 100vh; overflow-x:hidden; }
 
 /* MENU LATERAL LAKAMI */
-.sidebar { width: 260px; background: var(--sidebar); color: var(--text-side); display: flex; flex-direction: column; transition: 0.3s; position: fixed; height: 100vh; z-index: 1000; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
+.sidebar { width: 260px; background: var(--sidebar); color: var(--text-side); display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: fixed; height: 100vh; z-index: 1000; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
 .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;}
 .sidebar-header img { max-width: 140px; border-radius: 12px; }
 .nav-menu { flex: 1; padding: 15px 0; overflow-y: auto; }
-.nav-item { padding: 12px 25px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; border-left: 4px solid transparent; font-size: 14px; font-weight: 500; color: var(--text-side); }
+.nav-item { padding: 14px 25px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; border-left: 4px solid transparent; font-size: 14px; font-weight: 500; color: var(--text-side); }
 .nav-item:hover { background: #f8fafc; color: var(--primary); }
 .nav-item.active { background: var(--sidebar-active); border-left: 4px solid var(--primary); color: var(--primary); font-weight: 700; }
 
 /* AREA PRINCIPAL */
-.main-content { flex: 1; margin-left: 260px; padding: 25px; transition: 0.3s; width: calc(100% - 260px); }
-.section { display: none; animation: fadeIn 0.3s ease-in; }
+.main-content { flex: 1; margin-left: 260px; padding: 20px; transition: margin 0.3s ease; width: calc(100% - 260px); }
+.section { display: none; animation: fadeIn 0.4s ease; }
 .section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
 /* CARDS E ELEMENTOS */
-.card { background:#fff; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 15px rgba(0,0,0,.05); border: 1px solid #f1f5f9; }
-input,select,button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; font-family:inherit; }
-button { background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:500; transition: 0.2s; }
+.card { background:#fff; border-radius:15px; padding:20px; margin-bottom:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,.05); border: 1px solid #f1f5f9; }
+input,select,button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #e2e8f0; font-family:inherit; outline: none; }
+button { background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:600; transition: all 0.2s; }
 button:hover { background:var(--primary-hover); transform: translateY(-1px); }
+button:active { transform: scale(0.98); }
 button.danger { background:#ef4444; } button.success { background:#10b981; }
 
-/* DASHBOARD */
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:20px; }
-.box { padding:20px; border-radius:10px; text-align:center; color:#fff; font-weight:700; font-size:14px; }
-.box span { font-size:22px; display: block; margin-top:8px; }
+/* DASHBOARD OTIMIZADO (SEM ALTERAR O HTML) */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
+.box { 
+    padding: 20px 15px; 
+    border-radius: 12px; 
+    text-align: center; 
+    color: #fff; 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    font-weight: 600; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.box span { font-size: 24px; font-weight: 700; margin-top: 8px; text-transform: none; letter-spacing: normal; }
+
 #saldoConta{background:#3b82f6} /* Azul Conta */
 #qtdEstoque{background:#8b5cf6} /* Roxo Estoque */
 #qtdVendidas{background:#f43f5e} /* Rosa Vendidas */
 #investimento{background:#f59e0b} #valorEstoque{background:#6366f1} #receitas{background:var(--secondary)} 
 #vendasAReceber{background:#0284c7} #despesas{background:#ef4444} #lucro{background:#10b981} #margem{background:#14b8a6}
 
-/* TABELAS E FOTOS */
-.table-wrapper { width:100%; overflow-x:auto; }
-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:14px; min-width: 600px; }
-th,td { padding:12px; border-bottom:1px solid #e2e8f0; text-align:left; vertical-align: middle; }
-th { background:#f8fafc; color: #64748b; font-weight: 600; border-top: 1px solid #e2e8f0; }
+/* TABELAS E FOTOS RESPONSIVAS */
+.table-wrapper { width:100%; overflow-x:auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+table { width:100%; border-collapse:collapse; font-size:14px; min-width: 650px; }
+th,td { padding:14px; border-bottom:1px solid #e2e8f0; text-align:left; vertical-align: middle; }
+th { background:#f8fafc; color: #64748b; font-weight: 600; }
 .acoes-btn { display: flex; gap: 5px; align-items: center; }
 .acoes-btn button { padding: 6px 10px; font-size: 12px; margin: 0; width: auto; }
 
@@ -68,7 +83,7 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; border-top: 1px solid
 /* PDV E LISTA CUSTOMIZADA */
 .pdv-container { display: flex; gap: 20px; flex-wrap: wrap; }
 .pdv-left { flex: 2; min-width: 300px; }
-.pdv-right { flex: 1; min-width: 280px; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; }
+.pdv-right { flex: 1; min-width: 280px; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; height: fit-content; }
 .total-carrinho { font-size: 32px; font-weight: 700; color: var(--secondary); text-align: center; margin-bottom: 10px; }
 
 /* CUSTOM DROPDOWN PRODUTOS NO PDV */
@@ -83,25 +98,34 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; border-top: 1px solid
 .select-item-placeholder { width: 45px; height: 45px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; text-align: center; line-height: 1.1; }
 
 .hidden { display:none !important; }
-.lucro-tag { font-size: 11px; background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #86efac; }
+.lucro-tag { font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; background: #fdf2f8; color: #be185d; border: 1px solid #fbcfe8; }
 .produto-img-box { display:flex; flex-direction:column; gap:8px; align-items:center; min-width: 120px; }
 .produto-img-preview { width:110px; height:110px; border-radius:8px; object-fit:cover; border: 2px dashed #ccc; background:#fff; }
 
-/* RESPONSIVIDADE */
-@media (max-width: 768px) {
-    .sidebar { width: 60px; }
+/* REGRAS DE RESPONSIVIDADE PARA CELULAR E TABLET */
+@media (max-width: 1024px) {
+    .sidebar { width: 70px; }
     .sidebar-header img { display: none; }
     .nav-item span { display: none; }
-    .main-content { margin-left: 60px; width: calc(100% - 60px); padding: 15px; }
-    .nav-item { padding: 15px; justify-content: center; }
-    .grid { grid-template-columns: 1fr 1fr; }
+    .main-content { margin-left: 70px; width: calc(100% - 70px); }
+    .nav-item { padding: 18px 0; justify-content: center; }
+}
+
+@media (max-width: 768px) {
+    .main-content { padding: 15px; width: calc(100% - 70px); }
+    .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .box { padding: 15px 10px; }
+    .box span { font-size: 18px; }
     .produto-img-box { width: 100%; flex-direction: row; justify-content: flex-start; }
     .produto-img-preview { width: 90px; height: 90px; }
+    .pdv-container { flex-direction: column; }
+    .flex { flex-direction: column; align-items: stretch; }
+    .flex button { width: 100%; }
 }
 
 /* LOGIN SCREEN COM BRANDING LAKAMI */
-#loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--secondary); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-#loginOverlay .card { padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+#loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--secondary); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;}
+#loginOverlay .card { padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; }
 
 #reciboImpressao { display: none; }
 @media print {
@@ -116,8 +140,8 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; border-top: 1px solid
 <div id="reciboImpressao"></div>
 
 <div id="loginOverlay">
-    <div class="card" style="width: 100%; max-width: 380px; text-align: center;">
-        <img src="logo lakami.jpg" alt="Lakami Kids" style="max-width: 160px; margin-bottom: 10px; border-radius: 12px;">
+    <div class="card">
+        <img src="logo-lakami.jpg" alt="Lakami Kids" style="max-width: 160px; margin-bottom: 10px; border-radius: 12px;">
         <h3 style="color: var(--text-side); margin-top: 0; font-weight: 700;">Acesso ao Sistema</h3>
         <input type="text" id="user" placeholder="Usuário">
         <input type="password" id="pass" placeholder="Senha">
@@ -128,7 +152,7 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; border-top: 1px solid
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <img src="logo lakami.jpg" alt="Lakami Kids">
+        <img src="logo-lakami.jpg" alt="Lakami Kids">
     </div>
     <div class="nav-menu">
         <div class="nav-item active" onclick="showSection('sec-resumo', this)">📊 <span>Resumo Financeiro</span></div>
