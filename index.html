@@ -23,7 +23,7 @@
 /* CORREÇÃO UNIVERSAL DE LARGURA PARA NÃO VAZAR NO CELULAR */
 *, *::before, *::after { box-sizing: border-box; }
 
-body { margin:0; font-family:'Roboto',sans-serif; background:var(--bg); color:#333; display: flex; min-height: 100vh; overflow-x:hidden; }
+body { margin:0; font-family:'Roboto',sans-serif; background:var(--bg); color:#333; display: flex; min-height: 100vh; overflow-x:hidden; width: 100%; }
 
 /* MENU LATERAL LAKAMI */
 .sidebar { width: 260px; background: var(--sidebar); color: var(--text-side); display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: fixed; height: 100vh; z-index: 1000; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
@@ -35,7 +35,7 @@ body { margin:0; font-family:'Roboto',sans-serif; background:var(--bg); color:#3
 .nav-item.active { background: var(--sidebar-active); border-left: 4px solid var(--primary); color: var(--primary); font-weight: 700; }
 
 /* AREA PRINCIPAL */
-.main-content { flex: 1; margin-left: 260px; padding: 20px; transition: margin 0.3s ease; width: calc(100% - 260px); }
+.main-content { flex: 1; margin-left: 260px; padding: 20px; transition: margin 0.3s ease; width: calc(100% - 260px); max-width: 100%; }
 .section { display: none; animation: fadeIn 0.4s ease; }
 .section.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -72,7 +72,7 @@ button.danger { background:#ef4444; } button.success { background:#10b981; }
 #vendasAReceber{background:#0284c7} #despesas{background:#ef4444} #lucro{background:#10b981} #margem{background:#14b8a6}
 
 /* TABELAS E FOTOS RESPONSIVAS */
-.table-wrapper { width:100%; overflow-x:auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+.table-wrapper { width:100%; max-width: 100%; overflow-x:auto; border-radius: 10px; border: 1px solid #e2e8f0; -webkit-overflow-scrolling: touch; }
 table { width:100%; border-collapse:collapse; font-size:14px; min-width: 650px; }
 th,td { padding:14px; border-bottom:1px solid #e2e8f0; text-align:left; vertical-align: middle; }
 th { background:#f8fafc; color: #64748b; font-weight: 600; }
@@ -115,28 +115,31 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; }
 }
 
 @media (max-width: 768px) {
-    .main-content { padding: 15px; width: calc(100% - 70px); }
+    .main-content { padding: 15px; width: calc(100% - 70px); max-width: calc(100vw - 70px); }
     .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     .box { padding: 15px 10px; }
     .box span { font-size: 18px; }
     .produto-img-box { width: 100%; flex-direction: row; justify-content: flex-start; }
     .produto-img-preview { width: 90px; height: 90px; }
     
-    /* FALLBACK GERAL PARA FORMULÁRIOS NO CELULAR */
-    .flex { flex-direction: column; align-items: stretch; }
-    .flex button { width: 100%; }
+    /* FALLBACK GERAL PARA TODOS OS CAMPOS DO SISTEMA NO CELULAR */
+    .flex { flex-direction: column; align-items: stretch; gap: 8px; }
+    .flex input, .flex select { width: 100%; min-width: 0; margin: 0; }
+    .flex button { width: 100%; margin: 0; }
+    
+    /* Correção para os Cards Lado a Lado (Ex: Clientes e Fornecedores) */
+    #sec-contatos > .flex { gap: 15px; }
+    #sec-contatos .card { min-width: 0; width: 100%; margin-bottom: 0; }
 
     /* OTIMIZAÇÃO EXCLUSIVA DO PDV PARA CELULAR */
     .pdv-container { flex-direction: column; gap: 15px; }
-    .pdv-left, .pdv-right { width: 100%; min-width: 100%; padding: 15px; }
+    .pdv-left, .pdv-right { width: 100%; min-width: 0; padding: 15px; }
     
-    /* Organizando a barra de Inserir no PDV */
     .pdv-left .flex { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-    .pdv-left .flex .custom-select { flex: 1 1 100%; margin-bottom: 5px; }
+    .pdv-left .flex .custom-select { flex: 1 1 100%; margin-bottom: 0; }
     .pdv-left .flex #qtdVenda { flex: 1 1 30%; max-width: none; margin: 0; }
     .pdv-left .flex button { flex: 2 1 60%; margin: 0; }
     
-    /* Enxugando a tabela do carrinho no celular */
     .carrinho-table { min-width: 100%; font-size: 13px; }
     .carrinho-table th, .carrinho-table td { padding: 8px 4px; }
     .total-carrinho { font-size: 26px; }
