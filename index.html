@@ -3,65 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI PRO - Cloud PDV</title>
+<title>LAKAMI KIDS - Cloud PDV</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
 <style>
-/* ESTILOS DA TELA - PRESERVADOS INTEGRALMENTE */
-body{margin:0;font-family:'Roboto',sans-serif;background:#f4f6f8;color:#333;overflow-x:hidden}
-header{background:linear-gradient(90deg,#7c3aed,#d946ef);color:#fff;padding:20px;text-align:center;font-size:26px;font-weight:700}
-.container{max-width:1400px;margin:auto;padding:10px}
-.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,.05);transition:.3s}
-.card:hover{box-shadow:0 6px 25px rgba(0,0,0,.1)}
-input,select,button{padding:10px;margin:5px 0;width:100%;box-sizing:border-box;border-radius:6px;border:1px solid #ccc; font-family:inherit;}
-button{background:#7c3aed;color:#fff;border:none;cursor:pointer;transition:0.2s;font-weight:500}
-button:hover{background:#6b21a8}
-button:disabled{background:#94a3b8; cursor:not-allowed;}
-button.danger{background:#ef4444;}
-button.danger:hover{background:#dc2626;}
-button.success{background:#10b981;}
-button.success:hover{background:#059669;}
-button.print{background:#475569;}
-button.print:hover{background:#334155;}
+:root {
+    /* PALETA DE CORES LAKAMI KIDS */
+    --primary: #ff4eb5; /* Rosa Lakami */
+    --primary-hover: #e83ea2;
+    --secondary: #00c7d4; /* Ciano/Azul Fundo Lakami */
+    --bg: #f0f7f8; /* Fundo geral do sistema levemente azulado */
+    --sidebar: #ffffff; /* Menu lateral clean/branco */
+    --text-side: #334155; /* Texto escuro para leitura */
+    --sidebar-active: #fdf2f8; /* Fundo rosa claro no menu ativo */
+}
+body { margin:0; font-family:'Roboto',sans-serif; background:var(--bg); color:#333; display: flex; min-height: 100vh; overflow-x:hidden; }
 
-/* RESPONSIVIDADE E TABELAS */
-.table-wrapper{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;min-width:700px}
-th,td{padding:12px 10px;border-bottom:1px solid #ddd;text-align:left}
-th{background:#f3f3f3}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-bottom:20px}
-.box{padding:20px;border-radius:10px;text-align:center;color:#fff;font-weight:700;transition:.3s;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.box span{font-size:22px;margin-top:8px}
+/* MENU LATERAL LAKAMI */
+.sidebar { width: 260px; background: var(--sidebar); color: var(--text-side); display: flex; flex-direction: column; transition: 0.3s; position: fixed; height: 100vh; z-index: 1000; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
+.sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;}
+.sidebar-header img { max-width: 140px; border-radius: 12px; }
+.nav-menu { flex: 1; padding: 15px 0; overflow-y: auto; }
+.nav-item { padding: 12px 25px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; border-left: 4px solid transparent; font-size: 14px; font-weight: 500; color: var(--text-side); }
+.nav-item:hover { background: #f8fafc; color: var(--primary); }
+.nav-item.active { background: var(--sidebar-active); border-left: 4px solid var(--primary); color: var(--primary); font-weight: 700; }
 
-#investimento{background:#f59e0b} 
-#valorEstoque{background:#6366f1} 
-#receitas{background:#8b5cf6} 
-#vendasAReceber{background:#0284c7}
-#despesas{background:#ef4444} 
-#lucro{background:#10b981} 
-#margem{background:#14b8a6}
+/* AREA PRINCIPAL */
+.main-content { flex: 1; margin-left: 260px; padding: 25px; transition: 0.3s; width: calc(100% - 260px); }
+.section { display: none; animation: fadeIn 0.3s ease-in; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.hidden{display:none !important}
-.flex{display:flex;gap:10px;flex-wrap:wrap; align-items:center;}
-.flex input, .flex select{flex:1; min-width: 150px;}
-.flex button {width: auto; padding: 10px 20px;}
-.carrinho-table th, .carrinho-table td{text-align:center;}
-.total-carrinho{font-weight:700;text-align:center;font-size:22px; color: #7c3aed; margin-bottom: 15px;}
-.card-title{font-size:18px;font-weight:700;margin-bottom:15px; border-bottom: 2px solid #f4f6f8; padding-bottom: 10px; display:flex; justify-content:space-between; align-items:center;}
-.acoes-btn {display: flex; gap: 5px; align-items: center;}
-.acoes-btn button {padding: 6px 10px; font-size: 12px; margin: 0;}
-.lucro-tag { font-size: 11px; background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #86efac; }
+/* CARDS E ELEMENTOS */
+.card { background:#fff; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 15px rgba(0,0,0,.05); border: 1px solid #f1f5f9; }
+input,select,button { padding:12px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; font-family:inherit; }
+button { background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:500; transition: 0.2s; }
+button:hover { background:var(--primary-hover); transform: translateY(-1px); }
+button.danger { background:#ef4444; } button.success { background:#10b981; }
 
-/* PDV LAYOUT */
+/* DASHBOARD */
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:20px; }
+.box { padding:20px; border-radius:10px; text-align:center; color:#fff; font-weight:700; font-size:14px; }
+.box span { font-size:22px; display: block; margin-top:8px; }
+#saldoConta{background:#3b82f6} /* Azul Conta */
+#qtdEstoque{background:#8b5cf6} /* Roxo Estoque */
+#qtdVendidas{background:#f43f5e} /* Rosa Vendidas */
+#investimento{background:#f59e0b} #valorEstoque{background:#6366f1} #receitas{background:var(--secondary)} 
+#vendasAReceber{background:#0284c7} #despesas{background:#ef4444} #lucro{background:#10b981} #margem{background:#14b8a6}
+
+/* TABELAS E FOTOS */
+.table-wrapper { width:100%; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; margin-top:10px; font-size:14px; min-width: 600px; }
+th,td { padding:12px; border-bottom:1px solid #e2e8f0; text-align:left; vertical-align: middle; }
+th { background:#f8fafc; color: #64748b; font-weight: 600; border-top: 1px solid #e2e8f0; }
+.acoes-btn { display: flex; gap: 5px; align-items: center; }
+.acoes-btn button { padding: 6px 10px; font-size: 12px; margin: 0; width: auto; }
+
+.flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.flex input, .flex select { flex:1; min-width: 150px; }
+.flex button { width: auto; padding: 12px 25px; }
+
+/* PDV E LISTA CUSTOMIZADA */
 .pdv-container { display: flex; gap: 20px; flex-wrap: wrap; }
 .pdv-left { flex: 2; min-width: 300px; }
-.pdv-right { flex: 1; min-width: 280px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; }
+.pdv-right { flex: 1; min-width: 280px; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; }
+.total-carrinho { font-size: 32px; font-weight: 700; color: var(--secondary); text-align: center; margin-bottom: 10px; }
 
+/* CUSTOM DROPDOWN PRODUTOS NO PDV */
+.custom-select { position: relative; flex: 3; background: #fff; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; user-select: none; }
+.select-selected { padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; min-height: 24px; font-size: 15px; }
+.select-items { position: absolute; background: #fff; top: 100%; left: 0; right: 0; z-index: 999; border: 1px solid #ccc; border-radius: 8px; max-height: 400px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15); margin-top: 5px; }
+.select-item-row { padding: 10px 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; transition: 0.2s; }
+.select-item-row:last-child { border-bottom: none; }
+.select-item-row:hover:not(.disabled) { background: #f8fafc; }
+.select-item-row.disabled { opacity: 0.5; cursor: not-allowed; background: #f1f5f9; }
+.select-item-row img { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; border: 1px solid #e2e8f0; }
+.select-item-placeholder { width: 45px; height: 45px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; text-align: center; line-height: 1.1; }
+
+.hidden { display:none !important; }
+.lucro-tag { font-size: 11px; background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #86efac; }
+.produto-img-box { display:flex; flex-direction:column; gap:8px; align-items:center; min-width: 120px; }
+.produto-img-preview { width:110px; height:110px; border-radius:8px; object-fit:cover; border: 2px dashed #ccc; background:#fff; }
+
+/* RESPONSIVIDADE */
 @media (max-width: 768px) {
+    .sidebar { width: 60px; }
+    .sidebar-header img { display: none; }
+    .nav-item span { display: none; }
+    .main-content { margin-left: 60px; width: calc(100% - 60px); padding: 15px; }
+    .nav-item { padding: 15px; justify-content: center; }
     .grid { grid-template-columns: 1fr 1fr; }
-    .pdv-left, .pdv-right { flex: 1 1 100%; }
+    .produto-img-box { width: 100%; flex-direction: row; justify-content: flex-start; }
+    .produto-img-preview { width: 90px; height: 90px; }
 }
 
-/* ESTILOS DE IMPRESSÃO */
+/* LOGIN SCREEN COM BRANDING LAKAMI */
+#loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--secondary); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+#loginOverlay .card { padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
 #reciboImpressao { display: none; }
 @media print {
     body * { visibility: hidden; }
@@ -74,165 +115,177 @@ th{background:#f3f3f3}
 
 <div id="reciboImpressao"></div>
 
-<header>LAKAMI PRO - Cloud PDV</header>
-<div class="container">
-
-<div id="loginBox" class="card" style="max-width: 400px; margin: 50px auto;">
-<h3 class="card-title" style="text-align: center;">Acesso ao Sistema Cloud</h3>
-<input type="text" id="user" placeholder="Usuário">
-<input type="password" id="pass" placeholder="Senha">
-<button id="btnLogin" onclick="login()">Entrar e Sincronizar</button>
-<p id="loginMsg" style="font-size: 12px; color: #10b981; text-align:center; font-weight:bold;"></p>
+<div id="loginOverlay">
+    <div class="card" style="width: 100%; max-width: 380px; text-align: center;">
+        <img src="logo lakami.jpg" alt="Lakami Kids" style="max-width: 160px; margin-bottom: 10px; border-radius: 12px;">
+        <h3 style="color: var(--text-side); margin-top: 0; font-weight: 700;">Acesso ao Sistema</h3>
+        <input type="text" id="user" placeholder="Usuário">
+        <input type="password" id="pass" placeholder="Senha">
+        <button id="btnLogin" onclick="login()" style="padding: 15px; font-size: 16px; margin-top: 10px;">Entrar na Loja</button>
+        <p id="loginMsg" style="text-align:center; font-size:12px; color: #10b981; margin-top:10px; font-weight:700;"></p>
+    </div>
 </div>
 
-<div id="sistema" class="hidden">
-
-<div class="card">
-<h3 class="card-title">Resumo Financeiro <span id="statusCloud" style="font-size:12px; background:#dcfce7; color:#166534; padding:4px 10px; border-radius:12px;">Nuvem Online 🟢</span></h3>
-<div class="grid">
-<div class="box" id="investimento">Custo do Estoque<span>R$ 0,00</span></div>
-<div class="box" id="valorEstoque">Venda Projetada<span>R$ 0,00</span></div>
-<div class="box" id="receitas">Vendas Recebidas<span>R$ 0,00</span></div>
-<div class="box" id="vendasAReceber">Vendas a Receber<span>R$ 0,00</span></div>
-<div class="box" id="despesas">Despesas<span>R$ 0,00</span></div>
-<div class="box" id="lucro">Lucro Líquido<span>0%</span></div>
-<div class="box" id="margem">Margem Global<span>0%</span></div>
-</div>
-</div>
-
-<div class="card">
-<h3 class="card-title">Gestão de Produtos</h3>
-<div class="flex">
-<input id="nomeProd" placeholder="Nome do Produto">
-<select id="tamProd"></select>
-<input id="compraProd" type="number" step="0.01" placeholder="Custo (R$)">
-<input id="vendaProd" type="number" step="0.01" placeholder="Venda (R$)">
-<input id="qtdProd" type="number" placeholder="Estoque Atual">
-<button id="btnAddProd" onclick="addProduto()">Salvar Produto</button>
-</div>
-<div class="table-wrapper">
-<table>
-<thead><tr><th>Produto</th><th>Tam</th><th>Estoque</th><th>Custo Unit.</th><th>Preço Venda</th><th>Ações</th></tr></thead>
-<tbody id="listaProd"></tbody>
-</table>
-</div>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="logo lakami.jpg" alt="Lakami Kids">
+    </div>
+    <div class="nav-menu">
+        <div class="nav-item active" onclick="showSection('sec-resumo', this)">📊 <span>Resumo Financeiro</span></div>
+        <div class="nav-item" onclick="showSection('sec-pdv', this)">🛒 <span>PDV / Nova Venda</span></div>
+        <div class="nav-item" onclick="showSection('sec-produtos', this)">📦 <span>Gestão de Produtos</span></div>
+        <div class="nav-item" onclick="showSection('sec-vendas', this)">📝 <span>Histórico de Vendas</span></div>
+        <div class="nav-item" onclick="showSection('sec-contatos', this)">👥 <span>Clientes & Fornecs</span></div>
+        <div class="nav-item" onclick="showSection('sec-compras', this)">🚚 <span>Compras / Estoque</span></div>
+        <div class="nav-item" onclick="showSection('sec-despesas', this)">💸 <span>Despesas da Loja</span></div>
+        <div class="nav-item" onclick="showSection('sec-backup', this)">💾 <span>Backup & Relatórios</span></div>
+    </div>
 </div>
 
-<div class="flex" style="gap: 20px;">
-    <div class="card" style="flex: 1; min-width: 300px;">
-        <h3 class="card-title">Clientes</h3>
-        <div class="flex">
-        <input id="clienteNome" placeholder="Nome do Cliente">
-        <input id="clienteTel" placeholder="Telefone/WhatsApp">
-        <button id="btnAddCliente" onclick="addCliente()">Salvar</button>
-        </div>
-        <div class="table-wrapper">
-        <table>
-        <thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead>
-        <tbody id="listaClientes"></tbody>
-        </table>
+<div class="main-content">
+    
+    <div id="sec-resumo" class="section active">
+        <div class="card">
+            <h3 style="margin-top:0">Dashboard Geral</h3>
+            <div class="grid">
+                <div class="box" id="saldoConta">Saldo em Conta<span>R$ 0,00</span></div>
+                <div class="box" id="qtdEstoque">Peças no Estoque<span>0</span></div>
+                <div class="box" id="qtdVendidas">Peças Vendidas<span>0</span></div>
+                <div class="box" id="investimento">Custo Estoque<span>R$ 0,00</span></div>
+                <div class="box" id="valorEstoque">Venda Projetada<span>R$ 0,00</span></div>
+                <div class="box" id="receitas">Vendas Recebidas<span>R$ 0,00</span></div>
+                <div class="box" id="vendasAReceber">A Receber (Fiado)<span>R$ 0,00</span></div>
+                <div class="box" id="despesas">Despesas<span>R$ 0,00</span></div>
+                <div class="box" id="lucro">Lucro Líquido<span>0%</span></div>
+                <div class="box" id="margem">Margem Global<span>0%</span></div>
+            </div>
         </div>
     </div>
 
-    <div class="card" style="flex: 1; min-width: 300px;">
-        <h3 class="card-title">Fornecedores</h3>
-        <div class="flex">
-        <input id="fornNome" placeholder="Nome da Empresa">
-        <input id="fornContato" placeholder="Contato">
-        <button id="btnAddForn" onclick="addFornecedor()">Salvar</button>
+    <div id="sec-pdv" class="section">
+        <div class="card">
+            <h3>Ponto de Venda (PDV)</h3>
+            <div class="pdv-container">
+                <div class="pdv-left">
+                    <div class="flex">
+                        <div class="custom-select" id="pdvSelectBox">
+                            <div class="select-selected" id="pdvSelectDisplay" onclick="togglePDVDropdown()">
+                                <span>Selecionar Produto...</span>
+                                <span style="color:#999; font-size:12px">▼</span>
+                            </div>
+                            <div class="select-items hidden" id="pdvSelectList">
+                                </div>
+                            <input type="hidden" id="selectProd" value="">
+                        </div>
+
+                        <input id="qtdVenda" type="number" value="1" style="max-width: 80px; text-align: center;" title="Quantidade">
+                        <button onclick="addCarrinho()">Inserir</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="carrinho-table"><thead><tr><th>Item</th><th>Qtd</th><th>Unit.</th><th>Subtotal</th><th>X</th></tr></thead><tbody id="carrinho"></tbody></table>
+                    </div>
+                </div>
+                <div class="pdv-right">
+                    <div class="total-carrinho" id="totalCarrinho">R$ 0,00</div>
+                    <select id="selectCliente"><option value="">Cliente Padrão (Avulso)</option></select>
+                    <select id="formaPag" onchange="tratarRegrasPagamento()">
+                        <option value="PIX">PIX</option>
+                        <option value="À vista (Dinheiro)">À vista (Dinheiro)</option>
+                        <option value="Cartão de Crédito">Cartão de Crédito</option>
+                        <option value="Cartão de Débito">Cartão de Débito</option>
+                        <option value="Prazo">A Prazo / Fiado</option>
+                    </select>
+                    <div id="boxDesconto" style="display:none; flex-direction:column; gap:5px"><label style="font-size:12px; font-weight:700; color:var(--primary)">Desconto Liberado (%)</label><input type="number" id="valorDesconto" value="0" oninput="atualizarCarrinho()"></div>
+                    <input type="date" id="dataPrazo" class="hidden" title="Data de Vencimento do Fiado">
+                    <button onclick="finalizarVenda()" class="success" style="padding:15px; font-size:16px; margin-top:15px">FINALIZAR VENDA</button>
+                </div>
+            </div>
         </div>
-        <div class="table-wrapper">
-        <table>
-        <thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead>
-        <tbody id="listaFornecedores"></tbody>
-        </table>
-        </div>
     </div>
-</div>
 
-<div class="card">
-    <h3 class="card-title">Histórico de Compras de Mercadorias (Isolado)</h3>
-    <div class="flex">
-        <input type="date" id="dataNovaCompra" title="Data da Compra">
-        <input type="text" id="empresaCompra" placeholder="Empresa/Fornecedor">
-        <input type="number" id="valorCompra" step="0.01" placeholder="Valor Produtos (R$)">
-        <input type="number" id="qtdPecasCompra" placeholder="Qtd de Peças">
-        <input type="number" id="freteCompra" step="0.01" placeholder="Frete (R$)">
-        <select id="pagCompra"><option value="PIX">PIX</option><option value="Cartão">Cartão</option></select>
-        <button onclick="addHistoricoCompra()">Registrar Compra</button>
-    </div>
-    <div class="table-wrapper">
-    <table>
-    <thead><tr><th>Data</th><th>Empresa</th><th>Peças</th><th>Valor Prod.</th><th>Frete</th><th>Total da Nota</th><th>Pagamento</th><th>Ações</th></tr></thead>
-    <tbody id="listaHistoricoCompras"></tbody>
-    </table>
-    </div>
-</div>
-
-<div class="card">
-    <h3 class="card-title">Despesas Operacionais</h3>
-    <div class="flex">
-    <input id="descDespesa" placeholder="Descrição (ex: Embalagens, Aluguel)">
-    <input id="valorDespesa" type="number" step="0.01" placeholder="Valor (R$)">
-    <button id="btnAddDesp" onclick="addDespesa()">Registrar Despesa</button>
-    </div>
-    <div class="table-wrapper">
-    <table>
-    <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
-    <tbody id="listaDespesas"></tbody>
-    </table>
-    </div>
-</div>
-
-<div class="card">
-    <h3 class="card-title">Ponto de Venda (PDV)</h3>
-    <div class="pdv-container">
-        <div class="pdv-left">
-            <div class="flex">
-                <select id="selectProd" style="flex: 3;"><option value="">Selecione o Produto...</option></select>
-                <input id="qtdVenda" type="number" placeholder="Qtd" min="1" value="1" style="flex: 1; max-width: 80px; text-align: center;">
-                <button onclick="addCarrinho()">Inserir</button>
+    <div id="sec-produtos" class="section">
+        <div class="card">
+            <h3>Gestão de Estoque e Cadastro</h3>
+            <div class="flex" style="align-items: flex-start; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div class="produto-img-box">
+                    <img id="previewImg" class="produto-img-preview" src="https://via.placeholder.com/120?text=Foto">
+                    <input type="file" id="imgProdFile" accept="image/*" style="display:none;" onchange="previewImage(event)">
+                    <button onclick="document.getElementById('imgProdFile').click()" style="background:#475569; padding:8px; font-size:12px; margin:0;">📷 Adicionar Foto</button>
+                </div>
+                <div class="flex" style="flex: 1; align-items: center;">
+                    <input id="nomeProd" placeholder="Nome do Produto">
+                    <select id="tamProd" style="min-width: 90px;"></select>
+                    <input id="compraProd" type="number" step="0.01" placeholder="Custo R$">
+                    <input id="vendaProd" type="number" step="0.01" placeholder="Venda R$">
+                    <input id="qtdProd" type="number" placeholder="Estoque">
+                    <button id="btnSalvarProd" onclick="addProduto()">Salvar Produto</button>
+                </div>
             </div>
             <div class="table-wrapper">
-            <table class="carrinho-table" style="margin-top: 15px;">
-                <thead><tr><th>Produto</th><th>Qtd</th><th>Unitário</th><th>Subtotal</th><th>Ações</th></tr></thead>
-                <tbody id="carrinho"></tbody>
-            </table>
+                <table><thead><tr><th>Foto</th><th>Produto</th><th>Tam</th><th>Estoque</th><th>Custo</th><th>Venda</th><th>Ações</th></tr></thead><tbody id="listaProd"></tbody></table>
             </div>
-        </div>
-        <div class="pdv-right">
-            <div class="total-carrinho" id="totalCarrinho">Total: R$ 0,00</div>
-            <select id="selectCliente"><option value="">Cliente Padrão (Avulso)</option></select>
-            <select id="formaPag" onchange="tratarRegrasPagamento()">
-                <option value="PIX">PIX</option>
-                <option value="À vista (Dinheiro)">À vista (Dinheiro)</option>
-                <option value="Cartão de Crédito">Cartão de Crédito</option>
-                <option value="Cartão de Débito">Cartão de Débito</option>
-                <option value="Prazo">A Prazo / Fiado</option>
-            </select>
-            <div id="boxDesconto" style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: -5px;">Desconto Liberado (%)</label>
-                <input type="number" id="valorDesconto" placeholder="Ex: 5" min="0" max="100" value="0" oninput="atualizarCarrinho()" style="border-color: #10b981;">
-            </div>
-            <input type="date" id="dataPrazo" class="hidden">
-            <button onclick="finalizarVenda()" style="background: #10b981; font-size: 16px; padding: 15px; margin-top: 15px;">Finalizar Venda</button>
         </div>
     </div>
-</div>
 
-<div class="card">
-<h3 class="card-title">Histórico de Vendas 
-    <button onclick="fechamentoCaixa()" style="background:#475569; font-size:12px; width:auto; padding:5px 15px">📊 Fechar Caixa</button>
-</h3>
-<div class="table-wrapper">
-<table>
-<thead><tr><th>Data</th><th>Produto</th><th>Cliente</th><th>Total</th><th>Dívida</th><th>Lucro Item</th><th>Situação</th><th>Ações</th></tr></thead>
-<tbody id="listaVendas"></tbody>
-</table>
-</div>
-</div>
+    <div id="sec-vendas" class="section">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h3 style="margin:0;">Histórico de Vendas Realizadas</h3>
+                <button onclick="fechamentoCaixa()" style="background:#475569; width:auto; padding:8px 15px; font-size:13px; margin:0;">📊 Fechar Caixa (Dia)</button>
+            </div>
+            <div class="table-wrapper">
+                <table><thead><tr><th>Data</th><th>Produto</th><th>Cliente</th><th>Total</th><th>Dívida</th><th>Lucro Item</th><th>Situação</th><th>Ações</th></tr></thead><tbody id="listaVendas"></tbody></table>
+            </div>
+        </div>
+    </div>
 
-</div>
+    <div id="sec-contatos" class="section">
+        <div class="flex" style="gap: 20px;">
+            <div class="card" style="flex: 1; min-width: 300px;">
+                <h3>Clientes da Loja</h3>
+                <div class="flex"><input id="clienteNome" placeholder="Nome do Cliente"><input id="clienteTel" placeholder="WhatsApp"><button id="btnSalvarCli" onclick="addCliente()">Salvar</button></div>
+                <div class="table-wrapper"><table><thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead><tbody id="listaClientes"></tbody></table></div>
+            </div>
+            <div class="card" style="flex: 1; min-width: 300px;">
+                <h3>Fornecedores Parceiros</h3>
+                <div class="flex"><input id="fornNome" placeholder="Nome da Empresa"><input id="fornContato" placeholder="Contato"><button id="btnSalvarForn" onclick="addFornecedor()">Salvar</button></div>
+                <div class="table-wrapper"><table><thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead><tbody id="listaFornecedores"></tbody></table></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sec-compras" class="section">
+        <div class="card">
+            <h3>Entrada de Mercadorias (Histórico)</h3>
+            <div class="flex">
+                <input type="date" id="dataNovaCompra"><input id="empresaCompra" placeholder="Fornecedor">
+                <input type="number" id="valorCompra" step="0.01" placeholder="Valor Produtos"><input type="number" id="qtdPecasCompra" placeholder="Qtd">
+                <input type="number" id="freteCompra" step="0.01" placeholder="Frete R$"><select id="pagCompra"><option value="PIX">PIX</option><option value="Cartão">Cartão</option></select>
+                <button onclick="addHistoricoCompra()">Registrar Compra</button>
+            </div>
+            <div class="table-wrapper"><table><thead><tr><th>Data</th><th>Fornecedor</th><th>Peças</th><th>Valor</th><th>Frete</th><th>Total Nota</th><th>Pagamento</th><th>Ações</th></tr></thead><tbody id="listaHistoricoCompras"></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="sec-despesas" class="section">
+        <div class="card">
+            <h3>Despesas Operacionais</h3>
+            <div class="flex"><input id="descDespesa" placeholder="Ex: Energia, Aluguel, Sacolas"><input id="valorDespesa" type="number" step="0.01" placeholder="Valor R$"><button onclick="addDespesa()">Salvar Despesa</button></div>
+            <div class="table-wrapper"><table><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead><tbody id="listaDespesas"></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="sec-backup" class="section">
+        <div class="card">
+            <h3>Backup e Relatórios Profissionais</h3>
+            <p style="color:#64748b; font-size:14px;">Exporte os dados das suas vendas para manter seu controle contábil ou realizar auditorias fora do sistema.</p>
+            <div class="grid">
+                <button onclick="exportarExcel()" style="background:#166534; padding:20px;">📗 Exportar para Excel (Planilha CSV)</button>
+                <button onclick="exportarPDF()" style="background:#991b1b; padding:20px;">📕 Exportar para PDF (Relatório Padrão)</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script type="module">
@@ -254,24 +307,20 @@ const db = getFirestore(app);
 const formatCurrency = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 const el = (id) => document.getElementById(id);
 
-const tamSelect = el("tamProd");
-tamSelect.innerHTML = `<option value="">Tamanho...</option><option value="Único">Único</option>`;
-for(let i=1; i<=12; i++){ tamSelect.innerHTML += `<option value="${i}">${i}</option>`; }
+window.showSection = function(id, element) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el(id).classList.add('active'); element.classList.add('active');
+};
 
 let produtos = [], clientes = [], fornecedores = [], vendas = [], despesas = [], historicoCompras = [], carrinhoArr = [];
-let editProdId=null, editCliId=null;
+let editProdId=null, editCliId=null, editFornId=null;
+let currentImgBase64 = "";
 
 async function puxarDadosNuvem() {
-    const fetchCol = async (n) => {
-        const snap = await getDocs(collection(db, n));
-        return snap.docs.map(d => d.data());
-    };
-    produtos = await fetchCol("produtos");
-    clientes = await fetchCol("clientes");
-    fornecedores = await fetchCol("fornecedores");
-    vendas = await fetchCol("vendas");
-    despesas = await fetchCol("despesas");
-    historicoCompras = await fetchCol("historicoCompras");
+    const fetchCol = async (n) => { const snap = await getDocs(collection(db, n)); return snap.docs.map(d => d.data()); };
+    produtos = await fetchCol("produtos"); clientes = await fetchCol("clientes"); fornecedores = await fetchCol("fornecedores");
+    vendas = await fetchCol("vendas"); despesas = await fetchCol("despesas"); historicoCompras = await fetchCol("historicoCompras");
 }
 
 async function salvarFirebase(col, item) { await setDoc(doc(db, col, item.id.toString()), item); }
@@ -279,100 +328,126 @@ async function deletarFirebase(col, id) { await deleteDoc(doc(db, col, id.toStri
 
 window.login = async function(){
     if(el("user").value==="admin" && el("pass").value==="1234"){ 
-        el("btnLogin").disabled = true;
-        el("loginMsg").innerText = "Sincronizando Nuvem...";
-        await puxarDadosNuvem();
-        el("loginBox").classList.add("hidden"); 
-        el("sistema").classList.remove("hidden"); 
-        el("dataNovaCompra").valueAsDate = new Date(); 
-        window.tratarRegrasPagamento(); 
-        atualizar(); 
-    } else { alert("Credenciais inválidas."); }
+        el("btnLogin").disabled = true; el("loginMsg").innerText = "Carregando a Nuvem...";
+        await puxarDadosNuvem(); el("loginOverlay").classList.add("hidden"); 
+        el("dataNovaCompra").valueAsDate = new Date(); atualizar(); 
+    } else alert("Acesso Negado.");
 };
 
+// --- LOGICA CUSTOM DROPDOWN PDV ---
+document.addEventListener("click", function(e){
+    let box = el("pdvSelectBox");
+    if(box && !box.contains(e.target)){
+        let list = el("pdvSelectList");
+        if(list) list.classList.add("hidden");
+    }
+});
+
+window.togglePDVDropdown = function() {
+    el("pdvSelectList").classList.toggle('hidden');
+};
+
+window.selecionarProdutoPDV = function(id, nome, img) {
+    el("selectProd").value = id;
+    let imgHtml = img ? `<img src="${img}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;">` : `<div style="width:30px;height:30px;background:#e2e8f0;border-radius:4px;"></div>`;
+    el("pdvSelectDisplay").innerHTML = `<div style="display:flex;align-items:center;gap:10px;">${imgHtml} <b>${nome}</b></div><span style="color:#999; font-size:12px">▼</span>`;
+    el("pdvSelectList").classList.add("hidden");
+};
+
+
+// --- IMAGENS ---
+window.previewImage = function(event) {
+    let file = event.target.files[0]; if(!file) return;
+    let reader = new FileReader();
+    reader.onload = function(e) { currentImgBase64 = e.target.result; el('previewImg').src = currentImgBase64; };
+    reader.readAsDataURL(file);
+};
+window.uploadFotoDireta = function(event, id) {
+    let file = event.target.files[0]; if(!file) return;
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let p = produtos.find(x => x.id == id);
+        if(p){ p.img = e.target.result; salvarFirebase("produtos", p); atualizar(); }
+    };
+    reader.readAsDataURL(file);
+};
+
+// --- PRODUTOS CRUD ---
 window.addProduto = function(){
-    const n = el("nomeProd").value.trim(); const t = el("tamProd").value;
-    const c = parseFloat(el("compraProd").value); const v = parseFloat(el("vendaProd").value); const q = parseInt(el("qtdProd").value);
-    if(!n || !t || isNaN(c) || isNaN(v) || isNaN(q)) return alert("Preencha tudo");
+    const n = el("nomeProd").value.trim(); const c = parseFloat(el("compraProd").value); const v = parseFloat(el("vendaProd").value);
+    const q = parseInt(el("qtdProd").value); const t = el("tamProd").value;
+    if(!n || isNaN(c)) return alert("Preencha Nome e Custo.");
     let obj = editProdId ? produtos.find(x => x.id == editProdId) : {id: Date.now()};
     obj.nome=n; obj.tam=t; obj.compra=c; obj.venda=v; obj.qtd=q;
+    if(currentImgBase64 !== "") obj.img = currentImgBase64; 
     if(!editProdId) produtos.push(obj);
-    editProdId=null; el("btnAddProd").innerText="Salvar Produto";
-    salvarFirebase("produtos", obj);
-    el("nomeProd").value=""; el("tamProd").value=""; el("compraProd").value=""; el("vendaProd").value=""; el("qtdProd").value="";
+    salvarFirebase("produtos", obj); editProdId=null; el("btnSalvarProd").innerText="Salvar Produto";
+    currentImgBase64=""; el('previewImg').src="https://via.placeholder.com/120?text=Foto";
+    el("nomeProd").value=""; el("compraProd").value=""; el("vendaProd").value=""; el("qtdProd").value="";
     atualizar();
 };
-
-window.editarProduto = function(id){
+window.editarProduto = function(id) {
     let p = produtos.find(x => x.id == id);
-    el("nomeProd").value=p.nome; el("tamProd").value=p.tam; el("compraProd").value=p.compra; el("vendaProd").value=p.venda; el("qtdProd").value=p.qtd;
-    editProdId=id; el("btnAddProd").innerText="Atualizar";
+    el("nomeProd").value = p.nome; el("tamProd").value = p.tam; el("compraProd").value = p.compra; el("vendaProd").value = p.venda; el("qtdProd").value = p.qtd;
+    currentImgBase64 = p.img || ""; el('previewImg').src = p.img || "https://via.placeholder.com/120?text=Foto";
+    editProdId = id; el("btnSalvarProd").innerText="Atualizar Produto";
+    showSection('sec-produtos', document.querySelectorAll('.nav-item')[2]);
 };
+window.excluirProduto = function(id){ if(confirm("Tem certeza que deseja excluir este produto?")){ produtos=produtos.filter(x=>x.id!=id); deletarFirebase("produtos", id); atualizar(); } };
 
-window.excluirProduto = function(id){
-    if(confirm("Excluir?")){ produtos=produtos.filter(x=>x.id!=id); deletarFirebase("produtos", id); atualizar(); }
+// --- CLIENTES E FORNECEDORES CRUD ---
+window.addCliente = function(){ 
+    const n = el("clienteNome").value.trim(); if(!n) return alert("Preencha o nome do cliente."); 
+    let obj = editCliId ? clientes.find(x=>x.id==editCliId) : {id: Date.now()}; 
+    obj.nome=n; obj.tel=el("clienteTel").value; 
+    if(!editCliId) clientes.push(obj); 
+    editCliId=null; el("btnSalvarCli").innerText="Salvar"; salvarFirebase("clientes", obj); el("clienteNome").value=""; el("clienteTel").value=""; atualizar(); 
 };
+window.editarCliente = function(id){ let c = clientes.find(x=>x.id==id); el("clienteNome").value=c.nome; el("clienteTel").value=c.tel; editCliId=id; el("btnSalvarCli").innerText="Atualizar Cliente"; showSection('sec-contatos', document.querySelectorAll('.nav-item')[4]); };
+window.excluirCliente = function(id){ if(confirm("Tem certeza que deseja excluir este cliente?")){ clientes=clientes.filter(x=>x.id!=id); deletarFirebase("clientes", id); atualizar(); } };
 
-window.addHistoricoCompra = function(){
-    const data = el("dataNovaCompra").value; const empresa = el("empresaCompra").value.trim();
-    const valor = parseFloat(el("valorCompra").value); const qtd = parseInt(el("qtdPecasCompra").value);
-    const frete = parseFloat(el("freteCompra").value) || 0; const pagamento = el("pagCompra").value;
-    if(!data || !empresa || isNaN(valor) || isNaN(qtd)) return alert("Preencha tudo");
-    let obj = {id: Date.now(), data, empresa, valor, qtd, frete, pagamento};
-    historicoCompras.push(obj);
-    salvarFirebase("historicoCompras", obj);
-    el("empresaCompra").value=""; el("valorCompra").value=""; el("qtdPecasCompra").value=""; el("freteCompra").value="";
-    atualizar();
+window.addFornecedor = function(){ 
+    const n = el("fornNome").value.trim(); if(!n) return alert("Preencha a empresa."); 
+    let obj = editFornId ? fornecedores.find(x=>x.id==editFornId) : {id: Date.now()}; 
+    obj.nome=n; obj.contato=el("fornContato").value; 
+    if(!editFornId) fornecedores.push(obj); 
+    editFornId=null; el("btnSalvarForn").innerText="Salvar"; salvarFirebase("fornecedores", obj); el("fornNome").value=""; el("fornContato").value=""; atualizar(); 
 };
+window.editarFornecedor = function(id){ let f = fornecedores.find(x=>x.id==id); el("fornNome").value=f.nome; el("fornContato").value=f.contato; editFornId=id; el("btnSalvarForn").innerText="Atualizar Fornecedor"; showSection('sec-contatos', document.querySelectorAll('.nav-item')[4]); };
+window.excluirFornecedor = function(id){ if(confirm("Tem certeza que deseja excluir este fornecedor?")){ fornecedores=fornecedores.filter(x=>x.id!=id); deletarFirebase("fornecedores", id); atualizar(); } };
 
-window.excluirHistoricoCompra = function(id){
-    if(confirm("Excluir?")){ historicoCompras=historicoCompras.filter(x=>x.id!=id); deletarFirebase("historicoCompras", id); atualizar(); }
-};
+// --- HISTORICOS E DESPESAS CRUD ---
+window.addHistoricoCompra = function(){ const data = el("dataNovaCompra").value; const empresa = el("empresaCompra").value.trim(); const valor = parseFloat(el("valorCompra").value); const qtd = parseInt(el("qtdPecasCompra").value); const frete = parseFloat(el("freteCompra").value) || 0; const pagamento = el("pagCompra").value; if(!data || !empresa || isNaN(valor) || isNaN(qtd)) return alert("Preencha todos os dados da compra."); let obj = {id: Date.now(), data, empresa, valor, qtd, frete, pagamento}; historicoCompras.push(obj); salvarFirebase("historicoCompras", obj); el("empresaCompra").value=""; el("valorCompra").value=""; el("qtdPecasCompra").value=""; el("freteCompra").value=""; atualizar(); };
+window.excluirHistoricoCompra = function(id){ if(confirm("Tem certeza que deseja excluir esta entrada de mercadoria?")){ historicoCompras=historicoCompras.filter(x=>x.id!=id); deletarFirebase("historicoCompras", id); atualizar(); } };
 
-window.addDespesa = function(){
-    const desc = el("descDespesa").value.trim(); const valor = parseFloat(el("valorDespesa").value);
-    if(!desc || isNaN(valor)) return alert("Preencha tudo");
-    let obj = {id: Date.now(), data: new Date().toISOString(), descricao: desc, valor: valor};
-    despesas.push(obj);
-    salvarFirebase("despesas", obj);
-    el("descDespesa").value=""; el("valorDespesa").value=""; atualizar();
-};
+window.addDespesa = function(){ const desc = el("descDespesa").value.trim(); const valor = parseFloat(el("valorDespesa").value); if(!desc || isNaN(valor)) return alert("Preencha a descrição e o valor."); let obj = {id: Date.now(), data: new Date().toISOString(), descricao: desc, valor: valor}; despesas.push(obj); salvarFirebase("despesas", obj); el("descDespesa").value=""; el("valorDespesa").value=""; atualizar(); };
+window.excluirDespesa = function(id){ if(confirm("Tem certeza que deseja excluir esta despesa?")){ despesas=despesas.filter(x=>x.id!=id); deletarFirebase("despesas", id); atualizar(); } };
 
-window.excluirDespesa = function(id){
-    if(confirm("Excluir?")){ despesas=despesas.filter(x=>x.id!=id); deletarFirebase("despesas", id); atualizar(); }
+// --- PDV E VENDAS ---
+window.addCarrinho = function(){
+    let pid = el("selectProd").value; if(!pid) return alert("Selecione um produto.");
+    let p = produtos.find(x => x.id == pid); let q = parseInt(el("qtdVenda").value);
+    if(q > p.qtd) return alert("Atenção: A quantidade selecionada é maior que o estoque disponível.");
+    
+    carrinhoArr.push({id: p.id, nome: `${p.nome} (${p.tam})`, qtd: q, venda: p.venda, compra: p.compra});
+    el("qtdVenda").value = "1"; 
+    
+    // Reseta visual do dropdown
+    el("selectProd").value = "";
+    el("pdvSelectDisplay").innerHTML = '<span>Selecionar Produto...</span><span style="color:#999; font-size:12px">▼</span>';
+    
+    window.atualizarCarrinho();
 };
-
-window.addCliente = function(){
-    const n = el("clienteNome").value.trim(); if(!n) return;
-    let obj = editCliId ? clientes.find(x=>x.id==editCliId) : {id: Date.now()};
-    obj.nome=n; obj.tel=el("clienteTel").value;
-    if(!editCliId) clientes.push(obj);
-    editCliId=null; el("btnAddCliente").innerText="Salvar";
-    salvarFirebase("clientes", obj);
-    el("clienteNome").value=""; el("clienteTel").value=""; atualizar();
+window.atualizarCarrinho = function(){
+    let st = 0; let tb = el("carrinho"); tb.innerHTML = "";
+    carrinhoArr.forEach((item, i) => {
+        st += (item.qtd * item.venda);
+        tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${formatCurrency(item.qtd*item.venda)}</td><td><button class="danger" onclick="removerCarrinho(${i})">X</button></td></tr>`;
+    });
+    let desc = parseFloat(el("valorDesconto").value) || 0;
+    el("totalCarrinho").innerText = "Total: " + formatCurrency(st * (1 - desc/100));
 };
-
-window.editarCliente = function(id){
-    let c = clientes.find(x=>x.id==id);
-    el("clienteNome").value=c.nome; el("clienteTel").value=c.tel;
-    editCliId=id; el("btnAddCliente").innerText="Atualizar";
-};
-
-window.excluirCliente = function(id){
-    if(confirm("Excluir?")){ clientes=clientes.filter(x=>x.id!=id); deletarFirebase("clientes", id); atualizar(); }
-};
-
-window.addFornecedor = function(){
-    const n = el("fornNome").value.trim(); if(!n) return;
-    let obj = {id: Date.now(), nome: n, contato: el("fornContato").value};
-    fornecedores.push(obj);
-    salvarFirebase("fornecedores", obj);
-    el("fornNome").value=""; el("fornContato").value=""; atualizar();
-};
-
-window.excluirFornecedor = function(id){
-    if(confirm("Excluir?")){ fornecedores=fornecedores.filter(x=>x.id!=id); deletarFirebase("fornecedores", id); atualizar(); }
-};
+window.removerCarrinho = (i) => { carrinhoArr.splice(i,1); window.atualizarCarrinho(); };
 
 window.tratarRegrasPagamento = function(){
     let f = el("formaPag").value; let dp = el("dataPrazo"); let bd = el("boxDesconto");
@@ -382,161 +457,188 @@ window.tratarRegrasPagamento = function(){
     window.atualizarCarrinho();
 };
 
-window.addCarrinho = function(){
-    let pid = el("selectProd").value; let q = parseInt(el("qtdVenda").value);
-    if(!pid || isNaN(q) || q < 1) return alert("Selecione produto e quantidade");
-    let p = produtos.find(x => x.id == pid);
-    let ex = carrinhoArr.find(x => x.id == p.id);
-    if((ex ? ex.qtd + q : q) > p.qtd) return alert("Estoque insuficiente");
-    if(ex) ex.qtd += q; else carrinhoArr.push({id: p.id, nome: `${p.nome} (${p.tam})`, qtd: q, venda: p.venda, compra: p.compra});
-    el("qtdVenda").value = "1"; window.atualizarCarrinho();
-};
-
-window.atualizarCarrinho = function(){
-    let tb = el("carrinho"); tb.innerHTML = ""; let st = 0;
-    carrinhoArr.forEach((item, i) => {
-        let sub = item.qtd * item.venda; st += sub;
-        tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${formatCurrency(item.venda)}</td><td>${formatCurrency(sub)}</td><td><button class="danger" onclick="removerCarrinho(${i})">X</button></td></tr>`;
-    });
-    let desc = parseFloat(el("valorDesconto").value) || 0;
-    let total = st * (1 - (desc/100));
-    el("totalCarrinho").innerText = "Total: " + formatCurrency(total);
-};
-
-window.removerCarrinho = function(i){ carrinhoArr.splice(i,1); window.atualizarCarrinho(); };
-
 window.finalizarVenda = function(){
-    if(!carrinhoArr.length) return alert("Carrinho vazio");
-    let cli = el("selectCliente").value; let f = el("formaPag").value; let dv = el("dataPrazo").value;
-    let desc = parseFloat(el("valorDesconto").value) || 0;
-    if(f === "Prazo" && !dv) return alert("Informe o vencimento");
-    
+    let f = el("formaPag").value; let desc = parseFloat(el("valorDesconto").value) || 0;
+    let vencimento = el("dataPrazo").value;
+    if(f === "Prazo" && !vencimento) return alert("Por favor, selecione a Data Prevista para Pagamento do Fiado.");
+    if(!carrinhoArr.length) return alert("O carrinho está vazio.");
+
     let uid = Date.now();
     carrinhoArr.forEach(item => {
-        let p = produtos.find(x => x.id == item.id);
-        if(p) { p.qtd -= item.qtd; salvarFirebase("produtos", p); }
+        let p = produtos.find(x => x.id == item.id); if(p) { p.qtd -= item.qtd; salvarFirebase("produtos", p); }
         let total = (item.venda * item.qtd) * (1 - (desc/100));
-        let vObj = {
-            id: uid + Math.random(), data: new Date().toISOString(), produtoId: item.id, produto: item.nome,
-            cliente: cli || "Avulso", quantidade: item.qtd, total, custoHistorico: item.compra * item.qtd,
-            forma: f, pagamentoPrevisto: dv || null,
-            saldoDevedor: (f === "Prazo" ? total : 0),
-            baixas: []
+        let vObj = { 
+            id: uid + Math.random(), data: new Date().toISOString(), produtoId: item.id, produto: item.nome, 
+            cliente: el("selectCliente").value || "Avulso", quantidade: item.qtd, total, custoHistorico: item.compra * item.qtd, 
+            saldoDevedor: (f === "Prazo" ? total : 0), forma: f, pagamentoPrevisto: vencimento || null, baixas: [] 
         };
         vendas.push(vObj); salvarFirebase("vendas", vObj);
     });
-    carrinhoArr = []; el("valorDesconto").value = "0";
-    window.atualizarCarrinho(); atualizar();
-    if(confirm("Venda salva! Imprimir?")) window.imprimirRecibo(vendas[vendas.length-1].id);
+    carrinhoArr = []; el("valorDesconto").value="0"; el("dataPrazo").value=""; 
+    window.atualizarCarrinho(); atualizar(); alert("Venda Finalizada com Sucesso!");
 };
 
 window.darBaixaVenda = function(id){
     let v = vendas.find(x => x.id == id);
-    let pg = parseFloat(prompt(`Dívida: ${formatCurrency(v.saldoDevedor)}\nQuanto o cliente está pagando?`, v.saldoDevedor));
+    let pg = parseFloat(prompt(`Divida Total: ${formatCurrency(v.saldoDevedor)}\nDigite exatamente o valor que o cliente está pagando hoje:`, v.saldoDevedor));
     if(!isNaN(pg) && pg > 0){
-        v.saldoDevedor = Number((v.saldoDevedor - pg).toFixed(2));
-        if(!v.baixas) v.baixas = [];
-        v.baixas.push({ valor: pg, data: new Date().toISOString() });
-        if(v.saldoDevedor === 0) v.forma = "Quitado";
-        salvarFirebase("vendas", v);
-        atualizar();
+        if(pg > v.saldoDevedor) return alert("O valor digitado é maior do que o cliente deve.");
+        v.saldoDevedor = Math.max(0, Number((v.saldoDevedor - pg).toFixed(2)));
+        if(!v.baixas) v.baixas = []; v.baixas.push({ valor: pg, data: new Date().toISOString() });
+        if(v.saldoDevedor === 0) v.forma = "Prazo (Quitado)";
+        salvarFirebase("vendas", v); atualizar();
     }
 };
 
+window.excluirVenda = function(id){ 
+    if(confirm("ATENÇÃO: Deseja realmente excluir esta venda?\nO item será devolvido ao estoque automaticamente.")){ 
+        let v = vendas.find(x => x.id == id); 
+        if(v){ let p = produtos.find(x => x.id == v.produtoId); if(p){ p.qtd += v.quantidade || 1; salvarFirebase("produtos", p); } } 
+        vendas=vendas.filter(x=>x.id!=id); deletarFirebase("vendas", id); atualizar(); 
+    } 
+};
+
+// --- IMPRESSAO E FECHAMENTO ---
 window.fechamentoCaixa = function(){
-    let hoje = new Date().toLocaleDateString();
-    let pix = 0, din = 0, deb = 0, cre = 0, fiadoGerado = 0, baixasHoje = 0;
+    let hoje = new Date().toLocaleDateString(); let pix=0, din=0, deb=0, cre=0, baixas=0;
     vendas.forEach(v => {
         if(new Date(v.data).toLocaleDateString() === hoje){
-            if(v.forma === "PIX") pix += v.total;
-            else if(v.forma.includes("Dinheiro")) din += v.total;
-            else if(v.forma.includes("Débito")) deb += v.total;
-            else if(v.forma.includes("Crédito")) cre += v.total;
-            else if(v.forma === "Prazo") fiadoGerado += v.total;
+            if(v.forma === "PIX") pix += v.total; else if(v.forma.includes("Dinheiro")) din += v.total;
+            else if(v.forma.includes("Débito")) deb += v.total; else if(v.forma.includes("Crédito")) cre += v.total;
         }
-        if(v.baixas) v.baixas.forEach(b => { if(new Date(b.data).toLocaleDateString() === hoje) baixasHoje += b.valor; });
+        if(v.baixas) v.baixas.forEach(b => { if(new Date(b.data).toLocaleDateString() === hoje) baixas += b.valor; });
     });
-    alert(`FECHAMENTO ${hoje}\n\nTotal Caixa: ${formatCurrency(pix+din+deb+cre+baixasHoje)}\n(PIX: ${formatCurrency(pix)} | Din: ${formatCurrency(din)} | Baixas: ${formatCurrency(baixasHoje)})`);
+    alert(`📊 FECHAMENTO ${hoje}\n\n💰 Total Caixa (Vendas de hoje + Baixas): ${formatCurrency(pix+din+deb+cre+baixas)}\n\nEntradas Discriminadas:\n- PIX: ${formatCurrency(pix)}\n- Dinheiro: ${formatCurrency(din)}\n- Cartões: ${formatCurrency(deb+cre)}\n- Baixas de Fiado: ${formatCurrency(baixas)}`);
 };
 
-window.excluirVenda = function(id){
-    if(confirm("Excluir?")){
-        let v = vendas.find(x => x.id == id);
-        if(v){ let p = produtos.find(x => x.id == v.produtoId); if(p){ p.qtd += v.quantidade; salvarFirebase("produtos", p); } }
-        vendas = vendas.filter(x => x.id != id); deletarFirebase("vendas", id); atualizar();
-    }
+window.exportarExcel = function() {
+    let csv = "Data;Produto;Cliente;Total;Custo;Lucro\n";
+    vendas.forEach(v => { csv += `${new Date(v.data).toLocaleDateString()};${v.produto};${v.cliente};${v.total};${v.custoHistorico};${(v.total-v.custoHistorico)}\n`; });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", "LAKAMI_VENDAS.csv"); link.click();
+};
+window.exportarPDF = function() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.text("Relatório Geral de Vendas - LAKAMI", 14, 15);
+    const data = vendas.map(v => [new Date(v.data).toLocaleDateString(), v.produto, v.cliente, formatCurrency(v.total), v.forma]);
+    doc.autoTable({ head: [['Data', 'Produto', 'Cliente', 'Total', 'Forma/Status']], body: data, startY: 20 });
+    doc.save("LAKAMI_RELATORIO.pdf");
 };
 
 window.imprimirRecibo = function(id){
     let v = vendas.find(x => x.id == id); if(!v) return;
-    let d = new Date(v.data);
-    el("reciboImpressao").innerHTML = `
-        <div style="text-align:center"><h2>LAKAMI</h2><p>@lakami_kids | 82 99381-7564</p></div>
-        <p>Data: ${d.toLocaleDateString()}</p><p>Cliente: ${v.cliente}</p>
-        <p>${v.quantidade}x ${v.produto} - ${formatCurrency(v.total)}</p>
-        <p>Pagamento: ${v.forma}</p>
-        <hr><p style="font-size:10px">Trocas em 30 dias com etiqueta e sem uso.</p>
-    `;
+    el("reciboImpressao").innerHTML = `<div style="text-align:center"><h2>LAKAMI</h2><p>@lakami_kids | 82 99381-7564</p></div><p>Data: ${new Date(v.data).toLocaleDateString()}</p><p>Cliente: ${v.cliente}</p><p>${v.quantidade || 1}x ${v.produto} - ${formatCurrency(v.total)}</p><p>Pagamento: ${v.forma}</p><hr><p style="font-size:10px">Trocas em 30 dias com etiqueta e sem uso.</p>`;
+    window.print();
+};
+window.imprimirReciboCompra = function(id){
+    let c = historicoCompras.find(x => x.id == id); if(!c) return;
+    el("reciboImpressao").innerHTML = `<div style="text-align:center"><h2>LAKAMI</h2><p>Comprovante de Entrada</p></div><p>Data: ${new Date(c.data).toLocaleDateString()}</p><p>Fornecedor: ${c.empresa}</p><p>Peças: ${c.qtd}</p><p>Valor Prod: ${formatCurrency(c.valor)}</p><p>Frete: ${formatCurrency(c.frete)}</p><b>Total Nota: ${formatCurrency(c.valor+c.frete)}</b><hr>`;
     window.print();
 };
 
 function atualizar(){
-    el("listaProd").innerHTML = ""; el("selectProd").innerHTML = '<option value="">Selecione...</option>';
-    let inv=0, est=0;
+    // PRODUTOS NA GESTÃO E NO NOVO DROPDOWN PDV
+    el("listaProd").innerHTML = ""; 
+    el("pdvSelectList").innerHTML = "";
+    
+    let inv=0, est=0, vr=0, varc=0, cv=0, td=0, qtdEstoque=0, qtdVendidas=0;
+    
     produtos.forEach(p => {
         inv += p.compra * p.qtd; est += p.venda * p.qtd;
-        el("listaProd").innerHTML += `<tr><td>${p.nome} ${p.qtd<5?'⚠️':''}</td><td>${p.tam}</td><td>${p.qtd}</td><td>${formatCurrency(p.compra)}</td><td>${formatCurrency(p.venda)}</td><td><button onclick="editarProduto(${p.id})">E</button><button class="danger" onclick="excluirProduto(${p.id})">X</button></td></tr>`;
-        if(p.qtd > 0) el("selectProd").innerHTML += `<option value="${p.id}">${p.nome} (${p.tam})</option>`;
+        qtdEstoque += p.qtd; // Soma do Estoque
+        
+        // 1. Tabela de Gestão de Produtos
+        let imgTag = p.img ? `<img src="${p.img}" style="width:80px;height:80px;border-radius:8px;object-fit:cover; border:1px solid #ccc;">` : "Sem Foto";
+        el("listaProd").innerHTML += `<tr>
+            <td>${imgTag}</td>
+            <td>${p.nome} ${p.qtd<5?'⚠️':''}</td>
+            <td>${p.tam}</td>
+            <td style="font-weight:bold;">${p.qtd}</td>
+            <td>${formatCurrency(p.compra)}</td>
+            <td>${formatCurrency(p.venda)}</td>
+            <td class="acoes-btn">
+                <button onclick="editarProduto(${p.id})">E</button>
+                <button onclick="document.getElementById('fileProd-${p.id}').click()" style="background:#f472b6; color:#fff;" title="Adicionar/Trocar Foto">📷</button>
+                <input type="file" id="fileProd-${p.id}" style="display:none;" accept="image/*" onchange="uploadFotoDireta(event, ${p.id})">
+                <button class="danger" onclick="excluirProduto(${p.id})">X</button>
+            </td>
+        </tr>`;
+
+        // 2. Custom Dropdown no PDV
+        let disabled = p.qtd <= 0;
+        let rowClass = disabled ? "select-item-row disabled" : "select-item-row";
+        let onclickAttr = disabled ? "" : `onclick="selecionarProdutoPDV(${p.id}, '${p.nome.replace(/'/g, "\\'")}', '${p.img || ''}')"`;
+        let stockColor = disabled ? '#ef4444' : '#10b981';
+        let stockText = disabled ? 'Esgotado' : `${p.qtd} unid.`;
+        let imgSmall = p.img ? `<img src="${p.img}">` : `<div class="select-item-placeholder">Sem<br>Foto</div>`;
+
+        el("pdvSelectList").innerHTML += `
+            <div class="${rowClass}" ${onclickAttr}>
+                ${imgSmall}
+                <div style="flex:1">
+                    <div style="font-weight:700; font-size:14px; color:#334155">${p.nome} (Tam: ${p.tam})</div>
+                    <div style="font-size:12px; color:${stockColor}; font-weight:600; margin-top:2px;">Estoque: ${stockText}</div>
+                </div>
+                <div style="font-weight:700; color:var(--primary); font-size:15px;">${formatCurrency(p.venda)}</div>
+            </div>
+        `;
     });
 
-    el("listaClientes").innerHTML = ""; el("selectCliente").innerHTML = '<option value="">Avulso</option>';
-    clientes.forEach(c => {
-        el("listaClientes").innerHTML += `<tr><td>${c.nome}</td><td>${c.tel}</td><td><button onclick="editarCliente(${c.id})">E</button><button onclick="excluirCliente(${c.id})">X</button></td></tr>`;
-        el("selectCliente").innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
-    });
-
+    // CLIENTES E FORNECEDORES
+    el("listaClientes").innerHTML = ""; el("selectCliente").innerHTML = '<option value="">Cliente Padrão (Avulso)</option>';
+    clientes.forEach(c => { el("listaClientes").innerHTML += `<tr><td>${c.nome}</td><td>${c.tel}</td><td class="acoes-btn"><button onclick="editarCliente(${c.id})">E</button><button class="danger" onclick="excluirCliente(${c.id})">X</button></td></tr>`; el("selectCliente").innerHTML += `<option value="${c.nome}">${c.nome}</option>`; });
     el("listaFornecedores").innerHTML = "";
-    fornecedores.forEach(f => el("listaFornecedores").innerHTML += `<tr><td>${f.nome}</td><td>${f.contato}</td><td><button onclick="excluirFornecedor(${f.id})">X</button></td></tr>`);
+    fornecedores.forEach(f => el("listaFornecedores").innerHTML += `<tr><td>${f.nome}</td><td>${f.contato}</td><td class="acoes-btn"><button onclick="editarFornecedor(${f.id})">E</button><button class="danger" onclick="excluirFornecedor(${f.id})">X</button></td></tr>`);
 
+    // COMPRAS E DESPESAS
     el("listaHistoricoCompras").innerHTML = "";
-    historicoCompras.forEach(c => el("listaHistoricoCompras").innerHTML += `<tr><td>${c.data}</td><td>${c.empresa}</td><td>${c.qtd}</td><td>${formatCurrency(c.valor)}</td><td>${formatCurrency(c.frete)}</td><td>${formatCurrency(c.valor+c.frete)}</td><td>${c.pagamento}</td><td><button onclick="excluirHistoricoCompra(${c.id})">X</button></td></tr>`);
+    historicoCompras.forEach(c => el("listaHistoricoCompras").innerHTML += `<tr><td>${new Date(c.data).toLocaleDateString()}</td><td>${c.empresa}</td><td>${c.qtd}</td><td>${formatCurrency(c.valor)}</td><td>${formatCurrency(c.frete)}</td><td>${formatCurrency(c.valor+c.frete)}</td><td>${c.pagamento}</td><td class="acoes-btn"><button onclick="imprimirReciboCompra(${c.id})" style="background:#0284c7;">📄</button><button class="danger" onclick="excluirHistoricoCompra(${c.id})">X</button></td></tr>`);
+    el("listaDespesas").innerHTML = "";
+    despesas.forEach(d => { td += d.valor; el("listaDespesas").innerHTML += `<tr><td>${new Date(d.data).toLocaleDateString()}</td><td>${d.descricao}</td><td>${formatCurrency(d.valor)}</td><td class="acoes-btn"><button class="danger" onclick="excluirDespesa(${d.id})">X</button></td></tr>`; });
 
-    el("listaDespesas").innerHTML = ""; let td=0;
-    despesas.forEach(d => { td += d.valor; el("listaDespesas").innerHTML += `<tr><td>${new Date(d.data).toLocaleDateString()}</td><td>${d.descricao}</td><td>${formatCurrency(d.valor)}</td><td><button onclick="excluirDespesa(${d.id})">X</button></td></tr>`; });
-
-    let vr=0, varc=0, cv=0;
-    vendas.forEach(v => {
-        vr += (v.total - (v.saldoDevedor || 0));
-        varc += (v.saldoDevedor || 0);
-        cv += v.custoHistorico || 0;
+    // VENDAS E DASHBOARD
+    vendas.forEach(v => { 
+        vr += (v.total - (v.saldoDevedor || 0)); 
+        varc += (v.saldoDevedor || 0); 
+        cv += v.custoHistorico || 0; 
+        qtdVendidas += (v.quantidade || 1); // Soma das Vendas
     });
-
+    
     let fTotal = vr + varc;
-    el("investimento").children[0].innerText = formatCurrency(inv);
-    el("valorEstoque").children[0].innerText = formatCurrency(est);
-    el("receitas").children[0].innerText = formatCurrency(vr);
-    el("vendasAReceber").children[0].innerText = formatCurrency(varc);
+    el("qtdEstoque").children[0].innerText = qtdEstoque;
+    el("qtdVendidas").children[0].innerText = qtdVendidas;
+    el("saldoConta").children[0].innerText = formatCurrency(vr - td); // Recebido - Despesas
+    
+    el("investimento").children[0].innerText = formatCurrency(inv); el("valorEstoque").children[0].innerText = formatCurrency(est);
+    el("receitas").children[0].innerText = formatCurrency(vr); el("vendasAReceber").children[0].innerText = formatCurrency(varc);
     el("despesas").children[0].innerText = formatCurrency(td);
+    
+    // FORMULA MATEMÁTICA DEFINITIVA (MANTIDA INTACTA)
     el("lucro").children[0].innerText = fTotal > 0 ? (((fTotal - cv - td) / fTotal) * 100).toFixed(1) + "%" : "0%";
     el("margem").children[0].innerText = fTotal > 0 ? (((fTotal - cv) / fTotal) * 100).toFixed(1) + "%" : "0%";
 
     el("listaVendas").innerHTML = "";
     vendas.sort((a,b)=>new Date(b.data)-new Date(a.data)).forEach(v => {
-        let lVal = v.total - v.custoHistorico;
-        let lPor = v.total > 0 ? (lVal/v.total*100).toFixed(1) : 0;
-        el("listaVendas").innerHTML += `<tr><td>${new Date(v.data).toLocaleDateString()}</td><td>${v.produto}</td><td>${v.cliente}</td><td>${formatCurrency(v.total)}</td><td style="color:${v.saldoDevedor>0?'red':'green'}">${formatCurrency(v.saldoDevedor || 0)}</td><td><span class="lucro-tag">${formatCurrency(lVal)} (${lPor}%)</span></td><td>${v.forma}</td><td class="acoes-btn">${v.saldoDevedor>0?`<button class="success" onclick="darBaixaVenda(${v.id})">$</button>`:''}<button onclick="imprimirRecibo(${v.id})">📄</button><button class="danger" onclick="excluirVenda(${v.id})">X</button></td></tr>`;
+        let lVal = v.total - v.custoHistorico; let lPor = v.total > 0 ? (lVal/v.total*100).toFixed(1) : 0;
+        let infoForma = v.forma;
+        if(v.forma === "Prazo" && v.pagamentoPrevisto && v.saldoDevedor > 0){ let splitD = v.pagamentoPrevisto.split("-"); if(splitD.length === 3) infoForma = `Prazo (Venc: ${splitD[2]}/${splitD[1]})`; }
+        el("listaVendas").innerHTML += `<tr><td>${new Date(v.data).toLocaleDateString()}</td><td>${v.produto}</td><td>${v.cliente}</td><td style="font-weight:bold;">${formatCurrency(v.total)}</td><td style="color:${v.saldoDevedor>0?'red':'green'}">${formatCurrency(v.saldoDevedor || 0)}</td><td><span class="lucro-tag" style="background:#fce7f3; color:#be185d; border-color:#fbcfe8;">${formatCurrency(lVal)} (${lPor}%)</span></td><td>${infoForma}</td><td class="acoes-btn">${v.saldoDevedor>0?`<button class="success" onclick="darBaixaVenda(${v.id})">💰 Baixar</button>`:''}<button onclick="imprimirRecibo(${v.id})" style="background:#0284c7;">📄</button><button class="danger" onclick="excluirVenda(${v.id})">X</button></td></tr>`;
     });
+    
+    const tamS = el("tamProd"); tamS.innerHTML = '<option value="Único">Único</option>';
+    for(let i=1; i<=14; i++) tamS.innerHTML += `<option value="${i}">${i}</option>`;
 }
 
-// Globaliza funções
-window.login=login; window.addProduto=addProduto; window.addCarrinho=addCarrinho; window.finalizarVenda=finalizarVenda;
-window.darBaixaVenda=darBaixaVenda; window.excluirVenda=excluirVenda; window.imprimirRecibo=imprimirRecibo;
-window.fechamentoCaixa=fechamentoCaixa; window.tratarRegrasPagamento=tratarRegrasPagamento; window.atualizarCarrinho=atualizarCarrinho;
-window.removerCarrinho=removerCarrinho; window.editarProduto=editarProduto; window.excluirProduto=excluirProduto;
-window.addHistoricoCompra=addHistoricoCompra; window.excluirHistoricoCompra=excluirHistoricoCompra;
-window.addDespesa=addDespesa; window.excluirDespesa=excluirDespesa;
+// BIND GLOBAL COMPLETO
+window.login=login; window.addProduto=addProduto; window.editarProduto=editarProduto; window.excluirProduto=excluirProduto; 
 window.addCliente=addCliente; window.editarCliente=editarCliente; window.excluirCliente=excluirCliente;
-window.addFornecedor=addFornecedor; window.excluirFornecedor=excluirFornecedor;
+window.addFornecedor=addFornecedor; window.editarFornecedor=editarFornecedor; window.excluirFornecedor=excluirFornecedor;
+window.addHistoricoCompra=addHistoricoCompra; window.excluirHistoricoCompra=excluirHistoricoCompra;
+window.addDespesa=addDespesa; window.excluirDespesa=excluirDespesa; window.addCarrinho=addCarrinho; window.removerCarrinho=removerCarrinho; 
+window.finalizarVenda=finalizarVenda; window.darBaixaVenda=darBaixaVenda; window.excluirVenda=excluirVenda;
+window.fechamentoCaixa=fechamentoCaixa; window.tratarRegrasPagamento=tratarRegrasPagamento; window.atualizarCarrinho=atualizarCarrinho; 
+window.exportarExcel=exportarExcel; window.exportarPDF=exportarPDF; window.previewImage=previewImage; window.uploadFotoDireta=uploadFotoDireta;
+window.imprimirRecibo=imprimirRecibo; window.imprimirReciboCompra=imprimirReciboCompra; window.togglePDVDropdown=togglePDVDropdown; window.selecionarProdutoPDV=selecionarProdutoPDV;
 </script>
 </body>
 </html>
