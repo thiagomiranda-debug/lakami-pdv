@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.9</title>
+<title>LAKAMI KIDS - Cloud PDV 3.10</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -83,7 +83,7 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 .hidden { display:none !important; }
 .lucro-tag { font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; background: #fdf2f8; color: #be185d; border: 1px solid #fbcfe8; }
 .produto-img-box { display:flex; flex-direction:column; gap:8px; align-items:center; min-width: 120px; }
-.produto-img-preview { width:110px; height:110px; border-radius:8px; object-fit:contain; border: 2px dashed #ccc; background:#f8fafc; } /* Alterado para contain para mostrar foto inteira */
+.produto-img-preview { width:110px; height:110px; border-radius:8px; object-fit:contain; border: 2px dashed #ccc; background:#f8fafc; }
 
 .btn-tamanho { background: #f8fafc; color: #475569; border: 2px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; font-size: 13px; margin:0; cursor:pointer; width:auto; font-weight:700; transition:0.2s; }
 .btn-tamanho:hover { background: #e2e8f0; border-color: #94a3b8; }
@@ -987,10 +987,16 @@ window.imprimirRecibo = function(id){
     ${v.saldoDevedor > 0 ? `<div class="linha" style="color:red; font-size:11px;"><span>Saldo Devedor (Fiado):</span> <span>${formatCurrency(v.saldoDevedor)}</span></div>` : ''}</div>
     <div class="recibo-footer"><p>Obrigado pela preferência!</p><p>Trocas em até 30 dias, com a etiqueta fixada na peça e sem marcas de uso.</p><p>Volte sempre! 🥰</p></div>`;
     
-    el("reciboImpressao").innerHTML = html;
+    let area = el("reciboImpressao");
+    area.innerHTML = html;
+    area.style.display = 'block';
     document.body.className = 'print-recibo';
-    window.print();
-    document.body.className = '';
+    
+    setTimeout(() => {
+        window.print();
+        document.body.className = '';
+        area.style.display = 'none';
+    }, 400);
 };
 
 window.imprimirReciboCompra = function(id){
@@ -1003,10 +1009,16 @@ window.imprimirReciboCompra = function(id){
     <div class="recibo-totais" style="margin-top: 15px;"><div class="linha"><span>Total de Peças:</span> <span>${c.qtd} unid.</span></div><div class="linha"><span>Valor dos Produtos:</span> <span>${formatCurrency(c.valor)}</span></div><div class="linha"><span>Valor do Frete:</span> <span>${formatCurrency(c.frete)}</span></div><div class="linha destaque"><span>CUSTO TOTAL:</span> <span>${formatCurrency(c.valor + c.frete)}</span></div><div class="linha" style="margin-top:6px; font-size:11px;"><span>Forma de Pagamento:</span> <span>${c.pagamento}</span></div></div>
     <div class="recibo-footer"><p>Documento de controlo interno de stock.</p></div>`;
     
-    el("reciboImpressao").innerHTML = html;
+    let area = el("reciboImpressao");
+    area.innerHTML = html;
+    area.style.display = 'block';
     document.body.className = 'print-recibo';
-    window.print();
-    document.body.className = '';
+    
+    setTimeout(() => {
+        window.print();
+        document.body.className = '';
+        area.style.display = 'none';
+    }, 400);
 };
 
 /* FUNÇÕES DO MODAL DE RECIBO E WHATSAPP */
@@ -1186,10 +1198,15 @@ window.imprimirCatalogoVisualEFechar = function() {
         </div>
     `;
     
+    areaPrint.style.display = 'block';
     document.body.className = 'print-catalogo';
-    window.print();
-    document.body.className = '';
-    fecharCatalogo();
+    
+    setTimeout(() => {
+        window.print();
+        document.body.className = '';
+        areaPrint.style.display = 'none';
+        fecharCatalogo();
+    }, 400);
 };
 
 window.copiarCatalogoTextoDaModal = function() {
