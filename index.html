@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.11</title>
+<title>LAKAMI KIDS - Cloud PDV 3.12</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -166,20 +166,53 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 #modalAcoesCatalogo { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.7); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
 #modalAcoesCatalogo .card { width: 100%; max-width: 350px; text-align: center; border-radius: 16px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin:0 auto; }
 
-/* ÁREAS DE IMPRESSÃO - Escondidas inteligentemente para forçar carregamento das imagens */
+/* ÁREAS DE IMPRESSÃO (Escondidas com segurança) */
 #reciboImpressao, #areaPrintCatalogo { 
-    position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; 
+    position: absolute; top: -9999px; z-index: -1000; opacity: 0; pointer-events: none;
 }
 
-/* SISTEMA INTELIGENTE DE IMPRESSÃO */
+/* SISTEMA INTELIGENTE DE IMPRESSÃO - CORREÇÃO DEFINITIVA */
 @media print {
-    body * { visibility: hidden; }
+    /* Desligar tudo que quebra o motor de impressão dos celulares */
+    body { 
+        display: block !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        background: #fff !important; 
+        height: auto !important; 
+        min-height: auto !important;
+        overflow: visible !important;
+    }
     
-    body.print-recibo #reciboImpressao, body.print-recibo #reciboImpressao * { visibility: visible; }
-    body.print-recibo #reciboImpressao { position: absolute; left: 0; top: 0; width: 80mm; max-width: 100%; height: auto; opacity: 1; display: block; overflow: visible; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; margin: 0; padding: 0 10px; pointer-events: auto; }
+    /* Sumir com o sistema todo (sem usar visibility) */
+    .sidebar, .main-content, #loginOverlay, #modalRecibo, #modalAcoesCatalogo, #modalCatalogo { 
+        display: none !important; 
+    }
     
-    body.print-catalogo #areaPrintCatalogo, body.print-catalogo #areaPrintCatalogo * { visibility: visible; }
-    body.print-catalogo #areaPrintCatalogo { position: absolute; left: 0; top: 0; width: 100%; height: auto; opacity: 1; display: block; overflow: visible; font-family: 'Roboto', sans-serif; background: #fff; pointer-events: auto; }
+    /* Ligar APENAS as folhas de impressão */
+    body.print-recibo #reciboImpressao { 
+        display: block !important; 
+        position: relative !important; 
+        top: 0 !important; left: 0 !important;
+        opacity: 1 !important; 
+        z-index: 1000 !important;
+        width: 80mm !important;
+        max-width: 100% !important;
+        font-family: 'Courier New', Courier, monospace; 
+        font-size: 12px; color: #000; margin: 0; padding: 0 10px; 
+    }
+    body:not(.print-recibo) #reciboImpressao { display: none !important; }
+    
+    body.print-catalogo #areaPrintCatalogo { 
+        display: block !important; 
+        position: relative !important; 
+        top: 0 !important; left: 0 !important;
+        opacity: 1 !important; 
+        z-index: 1000 !important;
+        width: 100% !important;
+        font-family: 'Roboto', sans-serif; background: #fff; 
+    }
+    body:not(.print-catalogo) #areaPrintCatalogo { display: none !important; }
     
     .recibo-header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-top: 10px;}
     .recibo-header h2 { margin: 0 0 5px 0; font-size: 22px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;}
@@ -993,8 +1026,11 @@ window.imprimirRecibo = function(id){
     
     el("reciboImpressao").innerHTML = html;
     document.body.className = 'print-recibo';
-    window.print();
-    document.body.className = '';
+    
+    setTimeout(() => {
+        window.print();
+        document.body.className = '';
+    }, 50);
 };
 
 window.imprimirReciboCompra = function(id){
@@ -1009,8 +1045,11 @@ window.imprimirReciboCompra = function(id){
     
     el("reciboImpressao").innerHTML = html;
     document.body.className = 'print-recibo';
-    window.print();
-    document.body.className = '';
+    
+    setTimeout(() => {
+        window.print();
+        document.body.className = '';
+    }, 50);
 };
 
 /* FUNÇÕES DO MODAL DE RECIBO E WHATSAPP */
@@ -1115,8 +1154,6 @@ function renderizarGridCatalogo() {
 window.abrirModalAcoesCatalogo = function() {
     if(produtosSelecionadosCatalogo.size === 0) return alert("Atenção: Primeiro, toque nos produtos que deseja enviar para os selecionar.");
     
-    // GERA O HTML DA IMPRESSÃO NESTE EXATO MOMENTO (no "fundo", invisível).
-    // Isto dá tempo de sobra para o telemóvel renderizar as fotos antes de clicar no botão final.
     let printHtml = '';
     produtos.forEach(p => {
         if(p.qtd > 0 && produtosSelecionadosCatalogo.has(p.id)) {
@@ -1124,7 +1161,6 @@ window.abrirModalAcoesCatalogo = function() {
             let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
             let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
             
-            // Adicionado break-inside: avoid para o produto não ser cortado na quebra de página do PDF
             printHtml += `
                 <div style="border:1px solid #e2e8f0; border-radius:12px; padding:15px; text-align:center; background:#fff; break-inside: avoid; page-break-inside: avoid;">
                     ${imgTag}
@@ -1192,13 +1228,14 @@ window.enviarCatalogoWhatsApp = function() {
 };
 
 window.imprimirCatalogoVisualEFechar = function() {
-    // Como tiramos o setTimeout, ele chama a janela de impressão diretamente
-    // Evitando ser bloqueado pelo telemóvel.
     fecharModalAcoesCatalogo();
     document.body.className = 'print-catalogo';
-    window.print();
-    document.body.className = '';
-    fecharCatalogo();
+    
+    setTimeout(() => {
+        window.print();
+        document.body.className = '';
+        fecharCatalogo();
+    }, 50);
 };
 
 window.copiarCatalogoTextoDaModal = function() {
