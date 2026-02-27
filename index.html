@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.0</title>
+<title>LAKAMI KIDS - Cloud PDV 3.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -23,7 +23,7 @@
 
 body { margin:0; font-family:'Roboto',sans-serif; background:var(--bg); color:#333; display: flex; min-height: 100vh; overflow-x:hidden; width: 100%; }
 
-/* MENU LATERAL LAKAMI */
+/* MENU LATERAL LAKAMI (Desktop) */
 .sidebar { width: 260px; background: var(--sidebar); color: var(--text-side); display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: fixed; height: 100vh; z-index: 1000; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
 .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: center; align-items: center;}
 .sidebar-header img { max-width: 140px; border-radius: 12px; }
@@ -42,7 +42,7 @@ input,select,button { padding:14px 12px; margin:5px 0; width:100%; border-radius
 button { background:var(--primary); color:#fff; border:none; cursor:pointer; font-weight:600; transition: all 0.2s; }
 button:hover { background:var(--primary-hover); transform: translateY(-1px); }
 button:active { transform: scale(0.98); }
-button.danger { background:#ef4444; } button.success { background:#10b981; } button.warning { background:#f59e0b; }
+button.danger { background:#ef4444; } button.success { background:#10b981; } button.warning { background:#f59e0b; } button.whatsapp { background:#25D366; }
 
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
 .box { padding: 20px 15px; border-radius: 12px; text-align: center; color: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; display: flex; flex-direction: column; justify-content: center; }
@@ -56,8 +56,10 @@ button.danger { background:#ef4444; } button.success { background:#10b981; } but
 table { width:100%; border-collapse:collapse; font-size:14px; min-width: 650px; }
 th,td { padding:14px; border-bottom:1px solid #e2e8f0; text-align:left; vertical-align: middle; }
 th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; }
-.acoes-btn { display: flex; gap: 5px; align-items: center; }
-.acoes-btn button { padding: 8px 12px; font-size: 12px; margin: 0; width: auto; }
+
+.acoes-btn { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
+.btn-acao { padding: 0 12px; font-size: 12px; height: 36px; min-width: 78px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; margin: 0; white-space: nowrap; }
+.btn-acao-x { padding: 0; font-size: 13px; height: 36px; width: 36px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; margin: 0; }
 
 .flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 .flex input, .flex select { flex:1; min-width: 150px; margin:0; }
@@ -88,7 +90,6 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 .btn-tamanho.ativo { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 8px rgba(255, 78, 181, 0.4); transform: scale(1.05); }
 .grade-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 10px; width: 100%; }
 
-/* OTIMIZAÇÃO MOBILE PROFISSIONAL */
 @media (max-width: 1024px) {
     .sidebar { width: 70px; }
     .sidebar-header img { display: none; }
@@ -97,50 +98,106 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
     .nav-item { padding: 18px 0; justify-content: center; font-size: 20px; }
 }
 
+/* NOVO: MOBILE FIRST - MENU NA BASE (APP STYLE) E AJUSTE DE GRELHAS */
 @media (max-width: 768px) {
-    .sidebar { width: 60px; }
-    .main-content { margin-left: 60px; padding: 15px; width: calc(100% - 60px); max-width: calc(100vw - 60px); }
-    .nav-item { padding: 15px 0; font-size: 20px; }
+    body { padding-bottom: 65px; display: block; }
     
-    .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sidebar { 
+        width: 100%; height: 65px; flex-direction: row; 
+        position: fixed; bottom: 0; left: 0; top: auto; 
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.08); z-index: 5000;
+    }
+    .sidebar-header { display: none; }
+    
+    .nav-menu { 
+        flex-direction: row; overflow-x: auto; overflow-y: hidden; 
+        padding: 0 10px; align-items: center; justify-content: flex-start; 
+        -webkit-overflow-scrolling: touch; 
+    }
+    
+    .nav-item { 
+        padding: 0 18px; font-size: 22px; height: 100%; display: flex; 
+        align-items: center; justify-content: center;
+        border-left: none; border-bottom: 4px solid transparent; 
+    }
+    
+    .nav-item.active { 
+        border-left: none; border-bottom: 4px solid var(--primary); 
+        background: transparent; 
+    }
+
+    .main-content { 
+        margin-left: 0; width: 100%; max-width: 100%; padding: 10px; margin-bottom: 20px;
+    }
+
+    .grid { grid-template-columns: 1fr; gap: 10px; } 
     .box { padding: 15px 10px; }
-    .box span { font-size: 18px; }
+    .box span { font-size: 20px; }
+
     .produto-img-box { width: 100%; flex-direction: row; justify-content: flex-start; }
-    .produto-img-preview { width: 90px; height: 90px; }
-    
+    .produto-img-preview { width: 80px; height: 80px; }
     .flex { flex-direction: column; align-items: stretch; gap: 10px; }
     .flex input, .flex select { width: 100%; min-width: 0; margin: 0; }
-    .flex button { width: 100%; margin: 0; }
+    .flex button { width: 100%; margin: 0; padding: 16px; } 
     
     .pdv-container { flex-direction: column; gap: 15px; }
     .pdv-left, .pdv-right { width: 100%; min-width: 0; padding: 15px; }
-    
     .pdv-left .flex-row-mobile { flex-direction: column; align-items: stretch; gap: 10px; }
     .pdv-left #qtdVenda { width: 100%; }
     
     .carrinho-table { min-width: 100%; font-size: 13px; }
     .carrinho-table th, .carrinho-table td { padding: 10px 5px; white-space: nowrap; }
-    td { white-space: nowrap; } /* Evita quebra de linha em tabelas no celular */
+    td { white-space: nowrap; } 
     .total-carrinho { font-size: 26px; }
     
-    /* Layout dos filtros do relatório para mobile */
     .filtros-relatorio { flex-direction: column; align-items: stretch !important; gap: 15px; }
+
+    #modalCatalogo .flex button { padding: 18px; font-size: 16px; }
 }
 
 #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--secondary); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;}
 #loginOverlay .card { padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; }
 
-#reciboImpressao { display: none; }
+/* MODAIS PADRONIZADOS */
+#modalRecibo { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.7); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+#modalRecibo .card { width: 100%; max-width: 320px; text-align: center; border-radius: 16px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin:0 auto;}
+
+#modalAcoesCatalogo { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.7); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+#modalAcoesCatalogo .card { width: 100%; max-width: 350px; text-align: center; border-radius: 16px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin:0 auto; }
+
+#reciboImpressao, #areaPrintCatalogo { display: none; }
+
+/* SISTEMA INTELIGENTE DE IMPRESSÃO (RECIBO VS CATÁLOGO) */
 @media print {
     body * { visibility: hidden; }
-    #reciboImpressao, #reciboImpressao * { visibility: visible; }
-    #reciboImpressao { position: absolute; left: 0; top: 0; width: 100%; max-width: 300px; display: block; font-family: monospace; }
+    
+    body.print-recibo #reciboImpressao, body.print-recibo #reciboImpressao * { visibility: visible; }
+    body.print-recibo #reciboImpressao { position: absolute; left: 0; top: 0; width: 80mm; max-width: 100%; display: block; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; margin: 0; padding: 0 10px; }
+    
+    body.print-catalogo #areaPrintCatalogo, body.print-catalogo #areaPrintCatalogo * { visibility: visible; }
+    body.print-catalogo #areaPrintCatalogo { position: absolute; left: 0; top: 0; width: 100%; display: block; font-family: 'Roboto', sans-serif; background: #fff; }
+    
+    .recibo-header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-top: 10px;}
+    .recibo-header h2 { margin: 0 0 5px 0; font-size: 22px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;}
+    .recibo-header p { margin: 2px 0; font-size: 11px; }
+    .recibo-info { margin-bottom: 10px; font-size: 11px; }
+    .recibo-info p { margin: 3px 0; }
+    .recibo-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 5px; }
+    .recibo-table th, .recibo-table td { text-align: left; padding: 5px 0; font-size: 11px; vertical-align: top; }
+    .recibo-table th { border-bottom: 1px dashed #000; font-weight: bold; }
+    .recibo-table .right { text-align: right; }
+    .recibo-totais { margin-bottom: 10px; font-size: 12px; width: 100%; }
+    .recibo-totais .linha { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .recibo-totais .destaque { font-size: 14px; font-weight: bold; margin-top: 6px; border-top: 1px solid #000; padding-top: 6px; }
+    .recibo-footer { text-align: center; font-size: 10px; margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; margin-bottom: 20px;}
+    .recibo-footer p { margin: 3px 0; line-height: 1.4;}
 }
 </style>
 </head>
 <body>
 
 <div id="reciboImpressao"></div>
+<div id="areaPrintCatalogo"></div>
 
 <div id="loginOverlay">
     <div class="card">
@@ -150,6 +207,78 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
         <input type="password" id="pass" placeholder="Senha">
         <button id="btnLogin" onclick="login()" style="padding: 15px; font-size: 16px; margin-top: 10px;">Entrar na Loja</button>
         <p id="loginMsg" style="text-align:center; font-size:12px; color: #10b981; margin-top:10px; font-weight:700;"></p>
+    </div>
+</div>
+
+<div id="modalRecibo" class="hidden">
+    <div class="card">
+        <h3 style="margin-top:0; color:var(--text-side);">Emitir Recibo</h3>
+        <p style="font-size:13px; color:#64748b; margin-bottom:20px;">Como deseja enviar o comprovante para o cliente?</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <button onclick="dispararReciboWhatsApp()" class="whatsapp" style="padding:14px; display:flex; justify-content:center; align-items:center; gap:8px;">
+                <span style="font-size:18px;">📲</span> Enviar por WhatsApp
+            </button>
+            <button onclick="dispararReciboPapel()" style="background:#0284c7; padding:14px; display:flex; justify-content:center; align-items:center; gap:8px;">
+                <span style="font-size:18px;">🖨️</span> Imprimir na Máquina
+            </button>
+            <button onclick="fecharModalRecibo()" style="background:#94a3b8; padding:14px; margin-top:10px;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalAcoesCatalogo" class="hidden">
+    <div class="card">
+        <h3 style="margin-top:0; color:var(--text-side);">Partilhar Vitrine</h3>
+        <p style="font-size:13px; color:#64748b; margin-bottom:15px;">Como deseja enviar os produtos selecionados?</p>
+
+        <div style="text-align:left; margin-bottom:15px;">
+            <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:5px;">1. Selecione o Cliente (Opcional)</label>
+            <select id="selectClienteCatalogo" style="width:100%; margin:0;">
+                <option value="">Nenhum (Escolher no WhatsApp)</option>
+            </select>
+        </div>
+
+        <div style="text-align:left; margin-bottom:10px;">
+            <label style="font-size:12px; font-weight:700; color:#475569; display:block;">2. Escolha o formato de envio</label>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <button onclick="enviarCatalogoWhatsApp()" class="whatsapp" style="padding:14px; display:flex; justify-content:center; align-items:center; gap:8px;">
+                <span style="font-size:18px;">📲</span> Enviar Lista p/ WhatsApp
+            </button>
+            <button onclick="imprimirCatalogoVisualEFechar()" style="background:#0284c7; padding:14px; display:flex; justify-content:center; align-items:center; gap:8px;">
+                <span style="font-size:18px;">🖨️</span> Salvar PDF / Imprimir
+            </button>
+            <button onclick="copiarCatalogoTextoDaModal()" style="background:#f1f5f9; color:#475569; padding:12px; border:1px solid #cbd5e1; font-size:13px;">
+                📋 Apenas Copiar Texto
+            </button>
+            <button onclick="fecharModalAcoesCatalogo()" style="background:#ef4444; padding:12px; margin-top:5px;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalCatalogo" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:4000; overflow-y:auto; padding:20px;">
+    <div style="max-width:900px; margin:0 auto; background:#fff; padding:25px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
+            <div>
+                <h2 style="margin:0; color:var(--primary);">Vitrine LAKAMI KIDS</h2>
+                <p style="margin:5px 0 0 0; font-size:14px; color:#64748b;">Selecione as peças que deseja incluir no catálogo de envio.</p>
+            </div>
+            <button onclick="fecharCatalogo()" class="danger btn-acao-x" style="font-size:16px;">X</button>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+            <button onclick="selecionarTodosCatalogo()" style="background:#475569; padding:10px 15px; font-size:12px; margin:0; width:auto;">☑️ Selecionar Todos</button>
+            <button onclick="limparSelecaoCatalogo()" style="background:#94a3b8; padding:10px 15px; font-size:12px; margin:0; width:auto;">☐ Limpar Seleção</button>
+        </div>
+
+        <div class="flex" style="gap:10px; margin-bottom:25px; border-bottom:1px solid #e2e8f0; padding-bottom:20px;">
+            <button onclick="abrirModalAcoesCatalogo()" style="background:var(--primary); padding:14px 20px; font-size:15px; flex:1; width:100%;">
+                <span style="font-size:18px; margin-right:8px;">📤</span> Partilhar Vitrine Selecionada
+            </button>
+        </div>
+
+        <div id="gridCatalogo" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px;">
+            </div>
     </div>
 </div>
 
@@ -221,7 +350,7 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
                             </div>
                             <div style="display:flex; gap:10px; width:100%;">
                                 <input id="qtdVenda" type="number" value="1" style="flex:1; text-align: center; margin:0;" title="Quantidade">
-                                <button class="btn-inserir" onclick="addCarrinho()" style="flex:2; margin:0;">Inserir</button>
+                                <button class="btn-inserir" onclick="addCarrinho()" style="flex:2; margin:0; padding: 14px 12px;">Inserir</button>
                             </div>
                         </div>
                         <div id="boxTamanhosPDV" style="display:none; background:#fff; padding:15px; border-radius:8px; border:2px dashed #cbd5e1;"></div>
@@ -260,7 +389,11 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 
     <div id="sec-produtos" class="section">
         <div class="card">
-            <h3>Gestão de Estoque e Grade de Tamanhos</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+                <h3 style="margin:0;">Gestão de Estoque e Grade</h3>
+                <button onclick="abrirCatalogo()" style="width:auto; margin:0; padding:12px 20px; background:var(--secondary); font-size:13px;">👁️ Ver Catálogo Digital</button>
+            </div>
+            
             <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; display:flex; flex-direction:column; gap:15px;">
                 <div class="flex" style="align-items: center;">
                     <div class="produto-img-box" style="margin-right:10px;">
@@ -292,7 +425,10 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h3 style="margin:0;">Histórico de Vendas (Trocas e Devoluções)</h3>
-                <button onclick="fechamentoCaixa()" style="background:#475569; width:auto; padding:10px 15px; font-size:13px; margin:0;">📊 Fechar Caixa (Dia)</button>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="date" id="dataFechamentoCaixa" style="margin:0; padding:10px; font-size:13px; border-radius:6px; border:1px solid #cbd5e1; height: 38px;">
+                    <button onclick="fechamentoCaixa()" style="background:#475569; width:auto; padding:0 15px; height:38px; font-size:13px; margin:0;">📊 Fechar Caixa</button>
+                </div>
             </div>
             <div class="table-wrapper" style="margin-top:15px;">
                 <table><thead><tr><th>Data</th><th>Produto & Tam</th><th>Cliente</th><th>Total</th><th>Dívida</th><th>Lucro Item</th><th>Situação</th><th>Ações</th></tr></thead><tbody id="listaVendas"></tbody></table>
@@ -305,11 +441,11 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
             <h3>Clientes da Loja (CRM)</h3>
             <div class="flex">
                 <input id="clienteNome" placeholder="Nome do Cliente">
-                <input id="clienteTel" placeholder="WhatsApp">
+                <input id="clienteTel" placeholder="WhatsApp (Apenas Números)">
                 <input type="date" id="clienteNasc" title="Data de Nascimento da Criança">
                 <button id="btnSalvarCli" onclick="addCliente()">Salvar Cliente</button>
             </div>
-            <div class="table-wrapper"><table><thead><tr><th>Nome</th><th>Contato</th><th>Nascimento</th><th>Vale-Crédito</th><th>Ações</th></tr></thead><tbody id="listaClientes"></tbody></table></div>
+            <div class="table-wrapper"><table><thead><tr><th>Nome</th><th>WhatsApp</th><th>Nascimento</th><th>Vale-Crédito</th><th>Ações</th></tr></thead><tbody id="listaClientes"></tbody></table></div>
         </div>
     </div>
 
@@ -408,8 +544,9 @@ window.showSection = function(id, element) {
 let produtos = [], clientes = [], fornecedores = [], vendas = [], despesas = [], historicoCompras = [], carrinhoArr = [];
 let editProdId=null, editCliId=null, editFornId=null;
 let currentImgBase64 = "";
+let idVendaAtualRecibo = null; 
+let produtosSelecionadosCatalogo = new Set();
 
-// MOTOR DE LOGIN PARALELO (MUITO MAIS RÁPIDO)
 async function puxarDadosNuvem() {
     const fetchCol = async (n) => { const snap = await getDocs(collection(db, n)); return snap.docs.map(d => d.data()); };
     const results = await Promise.all([
@@ -439,15 +576,14 @@ window.login = async function(){
         el("btnLogin").disabled = true; el("loginMsg").innerText = "A Iniciar Sistema Ultra-Rápido...";
         await puxarDadosNuvem(); el("loginOverlay").classList.add("hidden"); 
         el("dataNovaCompra").valueAsDate = new Date(); 
+        el("dataFechamentoCaixa").value = new Date().toISOString().split('T')[0];
         renderGradeUI();
         atualizar(); 
     } else alert("Acesso Negado.");
 };
 
 window.logout = function() {
-    if(confirm("Tem certeza que deseja sair e bloquear o sistema?")) {
-        window.location.reload();
-    }
+    if(confirm("Tem certeza que deseja sair e bloquear o sistema?")) window.location.reload();
 };
 
 document.addEventListener("click", function(e){
@@ -741,18 +877,32 @@ window.excluirVenda = function(id){
 };
 
 window.fechamentoCaixa = function(){
-    let hoje = new Date().toLocaleDateString(); let pix=0, din=0, deb=0, cre=0, baixas=0;
+    let dataSelecionada = el("dataFechamentoCaixa").value;
+    if(!dataSelecionada) return alert("Por favor, selecione uma data para realizar o fechamento.");
+
+    let dataObj = new Date(dataSelecionada + "T12:00:00");
+    let dataStrFiltro = dataObj.toLocaleDateString();
+
+    let pix=0, din=0, deb=0, cre=0, baixas=0;
+    
     vendas.forEach(v => {
-        if(v.status !== "Devolvido" && new Date(v.data).toLocaleDateString() === hoje){
-            if(v.forma === "PIX") pix += v.total; else if(v.forma.includes("Dinheiro")) din += v.total;
-            else if(v.forma.includes("Débito")) deb += v.total; else if(v.forma.includes("Crédito")) cre += v.total;
+        if(v.status !== "Devolvido" && new Date(v.data).toLocaleDateString() === dataStrFiltro){
+            if(v.forma === "PIX") pix += v.total; 
+            else if(v.forma.includes("Dinheiro")) din += v.total;
+            else if(v.forma.includes("Débito")) deb += v.total; 
+            else if(v.forma.includes("Crédito")) cre += v.total;
         }
-        if(v.baixas) v.baixas.forEach(b => { if(new Date(b.data).toLocaleDateString() === hoje) baixas += b.valor; });
+        
+        if(v.baixas) {
+            v.baixas.forEach(b => { 
+                if(new Date(b.data).toLocaleDateString() === dataStrFiltro) baixas += b.valor; 
+            });
+        }
     });
-    alert(`📊 FECHAMENTO ${hoje}\n\n💰 Dinheiro Novo no Caixa Hoje: ${formatCurrency(pix+din+deb+cre+baixas)}\n\nEntradas Discriminadas:\n- PIX: ${formatCurrency(pix)}\n- Dinheiro: ${formatCurrency(din)}\n- Cartões: ${formatCurrency(deb+cre)}\n- Baixas de Fiado: ${formatCurrency(baixas)}\n\n*Valores pagos via Vale-Crédito não entram no Fechamento do Caixa físico.`);
+
+    alert(`📊 FECHAMENTO DO DIA: ${dataStrFiltro}\n\n💰 Dinheiro Novo no Caixa: ${formatCurrency(pix+din+deb+cre+baixas)}\n\nEntradas Discriminadas:\n- PIX: ${formatCurrency(pix)}\n- Dinheiro: ${formatCurrency(din)}\n- Cartões: ${formatCurrency(deb+cre)}\n- Baixas de Fiado: ${formatCurrency(baixas)}\n\n*Valores pagos via Vale-Crédito não entram no Fechamento físico.`);
 };
 
-// NOVO MOTOR DE RELATÓRIOS
 window.gerarRelatorio = function(formato) {
     let tipo = el("tipoRelatorio").value;
     let dIniStr = el("dataIniRel").value;
@@ -820,14 +970,244 @@ window.gerarRelatorio = function(formato) {
 window.imprimirRecibo = function(id){
     let v = vendas.find(x => x.id == id); if(!v) return;
     let nExibicao = v.tamanhoProduto ? `${v.produto} (Tam: ${v.tamanhoProduto})` : v.produto;
-    let txtCredito = v.creditoAbatido > 0 ? `<p>Pago com Crédito: ${formatCurrency(v.creditoAbatido)}</p>` : '';
-    el("reciboImpressao").innerHTML = `<div style="text-align:center"><h2>LAKAMI</h2><p>@lakami_kids | 82 99381-7564</p></div><p>Data: ${new Date(v.data).toLocaleDateString()}</p><p>Cliente: ${v.cliente}</p><p>${v.quantidade || 1}x ${nExibicao} - ${formatCurrency(v.total + (v.creditoAbatido||0))}</p>${txtCredito}<p>Forma de Pag.: ${v.forma}</p><p><b>Total a Pagar Hoje: ${formatCurrency(v.total)}</b></p><hr><p style="font-size:10px">Trocas em 30 dias com etiqueta e sem uso.</p>`;
+    let dataHora = new Date(v.data);
+    let dataFormatada = dataHora.toLocaleDateString() + ' às ' + dataHora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    let reciboId = v.id.toString().substring(0, 8); 
+    let valorTotalItem = v.total + (v.creditoAbatido||0);
+
+    let html = `
+    <div class="recibo-header"><h2>LAKAMI KIDS</h2><p>Instagram: @lakami_kids</p><p>WhatsApp: (82) 99381-7564</p></div>
+    <div class="recibo-info"><p><b>Data:</b> ${dataFormatada}</p><p><b>Recibo Nº:</b> ${reciboId}</p><p><b>Cliente:</b> ${v.cliente}</p></div>
+    <table class="recibo-table"><thead><tr><th>Qtd</th><th>Descrição</th><th class="right">Total</th></tr></thead>
+    <tbody><tr><td>${v.quantidade || 1}x</td><td>${nExibicao}</td><td class="right">${formatCurrency(valorTotalItem)}</td></tr></tbody></table>
+    <div class="recibo-totais"><div class="linha"><span>Subtotal:</span> <span>${formatCurrency(valorTotalItem)}</span></div>
+    ${v.creditoAbatido > 0 ? `<div class="linha"><span>Vale-Crédito Usado:</span> <span>- ${formatCurrency(v.creditoAbatido)}</span></div>` : ''}
+    <div class="linha destaque"><span>TOTAL A PAGAR:</span> <span>${formatCurrency(v.total)}</span></div>
+    <div class="linha" style="margin-top:6px; font-size:11px;"><span>Forma de Pagamento:</span> <span>${v.forma}</span></div>
+    ${v.saldoDevedor > 0 ? `<div class="linha" style="color:red; font-size:11px;"><span>Saldo Devedor (Fiado):</span> <span>${formatCurrency(v.saldoDevedor)}</span></div>` : ''}</div>
+    <div class="recibo-footer"><p>Obrigado pela preferência!</p><p>Trocas em até 30 dias, com a etiqueta fixada na peça e sem marcas de uso.</p><p>Volte sempre! 🥰</p></div>`;
+    
+    el("reciboImpressao").innerHTML = html;
+    document.body.className = 'print-recibo';
     window.print();
+    document.body.className = '';
 };
+
 window.imprimirReciboCompra = function(id){
     let c = historicoCompras.find(x => x.id == id); if(!c) return;
-    el("reciboImpressao").innerHTML = `<div style="text-align:center"><h2>LAKAMI</h2><p>Comprovante de Entrada</p></div><p>Data: ${new Date(c.data).toLocaleDateString()}</p><p>Fornecedor: ${c.empresa}</p><p>Peças: ${c.qtd}</p><p>Valor Prod: ${formatCurrency(c.valor)}</p><p>Frete: ${formatCurrency(c.frete)}</p><b>Total Nota: ${formatCurrency(c.valor+c.frete)}</b><hr>`;
+    let dataFormatada = new Date(c.data).toLocaleDateString();
+    let reciboId = c.id.toString().substring(0, 8);
+    let html = `
+    <div class="recibo-header"><h2>LAKAMI KIDS</h2><p>COMPROVANTE DE ENTRADA</p></div>
+    <div class="recibo-info"><p><b>Data de Entrada:</b> ${dataFormatada}</p><p><b>Registo Nº:</b> ${reciboId}</p><p><b>Fornecedor:</b> ${c.empresa}</p></div>
+    <div class="recibo-totais" style="margin-top: 15px;"><div class="linha"><span>Total de Peças:</span> <span>${c.qtd} unid.</span></div><div class="linha"><span>Valor dos Produtos:</span> <span>${formatCurrency(c.valor)}</span></div><div class="linha"><span>Valor do Frete:</span> <span>${formatCurrency(c.frete)}</span></div><div class="linha destaque"><span>CUSTO TOTAL:</span> <span>${formatCurrency(c.valor + c.frete)}</span></div><div class="linha" style="margin-top:6px; font-size:11px;"><span>Forma de Pagamento:</span> <span>${c.pagamento}</span></div></div>
+    <div class="recibo-footer"><p>Documento de controlo interno de stock.</p></div>`;
+    
+    el("reciboImpressao").innerHTML = html;
+    document.body.className = 'print-recibo';
     window.print();
+    document.body.className = '';
+};
+
+/* FUNÇÕES DO MODAL DE RECIBO E WHATSAPP */
+window.abrirModalRecibo = function(id) { idVendaAtualRecibo = id; el("modalRecibo").classList.remove("hidden"); };
+window.fecharModalRecibo = function() { el("modalRecibo").classList.add("hidden"); idVendaAtualRecibo = null; };
+window.dispararReciboWhatsApp = function() { if(idVendaAtualRecibo) window.enviarReciboWhatsApp(idVendaAtualRecibo); fecharModalRecibo(); };
+window.dispararReciboPapel = function() { if(idVendaAtualRecibo) window.imprimirRecibo(idVendaAtualRecibo); fecharModalRecibo(); };
+
+window.enviarParabensWhatsApp = function(idCliente) {
+    let c = clientes.find(x => x.id == idCliente);
+    if(!c || !c.tel) return alert("O cliente não tem número de WhatsApp registado.");
+    let fone = c.tel.replace(/\D/g, ''); 
+    if(fone.length < 10) return alert("Número de telefone inválido. Verifique o cadastro.");
+    if(!fone.startsWith('55') && fone.length <= 11) fone = '55' + fone; 
+    let texto = `🎉 Olá, ${c.nome}! Aqui é da Lakami Kids.\n\nVimos que este é o mês do seu aniversário! 🎂\nPara celebrar, temos um presente especial à sua espera na nossa loja.\n\nVenha visitar-nos e garanta o seu mimo especial! 🛍️✨`;
+    window.open(`https://wa.me/${fone}?text=${encodeURIComponent(texto)}`, '_blank');
+};
+
+window.enviarReciboWhatsApp = function(idVenda) {
+    let v = vendas.find(x => x.id == idVenda); if(!v) return;
+    let c = clientes.find(x => x.nome === v.cliente);
+    if(!c || !c.tel) return alert("Para enviar o recibo no telemóvel, o cliente ( "+v.cliente+" ) precisa estar registado com um número de WhatsApp.");
+    let fone = c.tel.replace(/\D/g, '');
+    if(fone.length < 10) return alert("Número de telefone inválido no cadastro do cliente.");
+    if(!fone.startsWith('55') && fone.length <= 11) fone = '55' + fone;
+    let nExibicao = v.tamanhoProduto ? `${v.produto} (Tam: ${v.tamanhoProduto})` : v.produto;
+    let txtDevedor = v.saldoDevedor > 0 ? `\n*Ficou a dever:* ${formatCurrency(v.saldoDevedor)} (Venc: ${v.pagamentoPrevisto ? v.pagamentoPrevisto.split("-").reverse().join("/") : "A combinar"})` : "";
+    let texto = `Olá, ${v.cliente}! 🛍️ Obrigado por comprar na *LAKAMI KIDS*.\n\n*Resumo da sua compra:*\nData: ${new Date(v.data).toLocaleDateString()}\nItem: ${v.quantidade || 1}x ${nExibicao}\nValor: ${formatCurrency(v.total + (v.creditoAbatido||0))}\nForma Pag.: ${v.forma}${txtDevedor}\n\nAgradecemos a preferência! 🥰\n📍 @lakami_kids | (82) 99381-7564`;
+    window.open(`https://wa.me/${fone}?text=${encodeURIComponent(texto)}`, '_blank');
+};
+
+/* FUNÇÕES DO CATÁLOGO DIGITAL E PARTILHA INTELIGENTE */
+window.abrirCatalogo = function() {
+    produtosSelecionadosCatalogo.clear();
+    renderizarGridCatalogo();
+    el("modalCatalogo").classList.remove("hidden");
+};
+
+window.fecharCatalogo = function() { el("modalCatalogo").classList.add("hidden"); };
+
+window.toggleSelecaoCatalogo = function(id) {
+    let card = el("card-cat-" + id);
+    let check = el("check-cat-" + id);
+    
+    if(produtosSelecionadosCatalogo.has(id)) {
+        produtosSelecionadosCatalogo.delete(id);
+        card.style.border = "1px solid #e2e8f0";
+        card.style.background = "#fff";
+        check.style.background = "#e2e8f0";
+        check.innerText = "";
+    } else {
+        produtosSelecionadosCatalogo.add(id);
+        card.style.border = "3px solid var(--primary)";
+        card.style.background = "#fdf2f8";
+        check.style.background = "var(--primary)";
+        check.innerText = "✓";
+    }
+};
+
+window.selecionarTodosCatalogo = function() {
+    produtos.forEach(p => { if(p.qtd > 0) produtosSelecionadosCatalogo.add(p.id); });
+    renderizarGridCatalogo();
+};
+
+window.limparSelecaoCatalogo = function() {
+    produtosSelecionadosCatalogo.clear();
+    renderizarGridCatalogo();
+};
+
+function renderizarGridCatalogo() {
+    let grid = el("gridCatalogo");
+    grid.innerHTML = "";
+    let temEstoque = false;
+
+    produtos.forEach(p => {
+        if(p.qtd > 0) {
+            temEstoque = true;
+            let isSelected = produtosSelecionadosCatalogo.has(p.id);
+            let classSelecionado = isSelected ? 'border:3px solid var(--primary); background:#fdf2f8;' : 'border:1px solid #e2e8f0; background:#fff;';
+            let checkBg = isSelected ? 'var(--primary)' : '#e2e8f0';
+            let checkTxt = isSelected ? '✓' : '';
+
+            let imgTag = p.img ? `<img src="${p.img}" style="width:100%; height:200px; object-fit:cover; border-radius:10px; margin-bottom:12px; border:1px solid #e2e8f0;">` : `<div style="width:100%; height:200px; background:#e2e8f0; border-radius:10px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:bold;">Sem Foto</div>`;
+            let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
+            let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
+            
+            grid.innerHTML += `
+                <div id="card-cat-${p.id}" onclick="toggleSelecaoCatalogo(${p.id})" style="${classSelecionado} cursor:pointer; border-radius:12px; padding:15px; text-align:center; box-shadow:0 4px 6px -1px rgba(0,0,0,.05); transition:all 0.2s; position:relative;">
+                    <div id="check-cat-${p.id}" style="position:absolute; top:10px; right:10px; background:${checkBg}; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px; transition:all 0.2s;">${checkTxt}</div>
+                    ${imgTag}
+                    <h4 style="margin:0 0 8px 0; color:#334155; font-size:16px;">${p.nome}</h4>
+                    <div style="color:var(--primary); font-weight:900; font-size:20px; margin-bottom:10px;">${formatCurrency(p.venda)}</div>
+                    <div style="font-size:13px; color:#64748b; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">Disponível: <span style="font-weight:700; color:#475569;">${tamanhosStr.join(', ')}</span></div>
+                </div>
+            `;
+        }
+    });
+
+    if(!temEstoque) grid.innerHTML = "<div style='grid-column: 1 / -1; text-align:center; padding:40px; color:#64748b;'>Não existem produtos com stock disponível de momento.</div>";
+}
+
+window.abrirModalAcoesCatalogo = function() {
+    if(produtosSelecionadosCatalogo.size === 0) return alert("Atenção: Primeiro, toque nos produtos que deseja enviar para os selecionar.");
+    el("modalAcoesCatalogo").classList.remove("hidden");
+};
+
+window.fecharModalAcoesCatalogo = function() {
+    el("modalAcoesCatalogo").classList.add("hidden");
+};
+
+window.enviarCatalogoWhatsApp = function() {
+    let txt = "✨ *CATÁLOGO LAKAMI KIDS* ✨\n_Disponível para entrega imediata_\n\n";
+    
+    produtos.forEach(p => {
+        if(p.qtd > 0 && produtosSelecionadosCatalogo.has(p.id)) {
+            let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
+            let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
+            txt += `🛍️ *${p.nome}*\n📏 Tamanhos: ${tamanhosStr.join(', ')}\n💰 Valor: ${formatCurrency(p.venda)}\n\n`;
+        }
+    });
+    
+    txt += "Peça já fotos detalhadas ou reserve o seu! 🥰\n📍 Instagram: @lakami_kids\n📲 WhatsApp: (82) 99381-7564";
+    
+    let idCliente = el("selectClienteCatalogo").value;
+    let url = "";
+
+    if(idCliente) {
+        let c = clientes.find(x => x.id == idCliente);
+        if(c && c.tel) {
+            let fone = c.tel.replace(/\D/g, '');
+            if(!fone.startsWith('55') && fone.length <= 11) fone = '55' + fone;
+            url = `https://wa.me/${fone}?text=${encodeURIComponent(txt)}`;
+        } else {
+            alert("Atenção: A cliente selecionada não tem WhatsApp cadastrado. O WhatsApp será aberto para você escolher o contato manualmente.");
+            url = `https://wa.me/?text=${encodeURIComponent(txt)}`;
+        }
+    } else {
+        url = `https://wa.me/?text=${encodeURIComponent(txt)}`;
+    }
+
+    window.open(url, '_blank');
+    fecharModalAcoesCatalogo();
+    fecharCatalogo();
+};
+
+window.imprimirCatalogoVisualEFechar = function() {
+    fecharModalAcoesCatalogo();
+    
+    let printHtml = '';
+    produtos.forEach(p => {
+        if(p.qtd > 0 && produtosSelecionadosCatalogo.has(p.id)) {
+            let imgTag = p.img ? `<img src="${p.img}" style="width:100%; height:200px; object-fit:cover; border-radius:10px; margin-bottom:12px; border:1px solid #e2e8f0;">` : `<div style="width:100%; height:200px; background:#e2e8f0; border-radius:10px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:bold;">Sem Foto</div>`;
+            let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
+            let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
+            
+            printHtml += `
+                <div style="border:1px solid #e2e8f0; border-radius:12px; padding:15px; text-align:center; background:#fff;">
+                    ${imgTag}
+                    <h4 style="margin:0 0 8px 0; color:#334155; font-size:16px;">${p.nome}</h4>
+                    <div style="color:#ff4eb5; font-weight:900; font-size:20px; margin-bottom:10px;">${formatCurrency(p.venda)}</div>
+                    <div style="font-size:13px; color:#64748b; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
+                        Disponível: <span style="font-weight:700; color:#475569;">${tamanhosStr.join(', ')}</span>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    let areaPrint = el("areaPrintCatalogo");
+    areaPrint.innerHTML = `
+        <div style="text-align:center; margin-bottom:30px; padding-bottom:15px; border-bottom:2px solid #f1f5f9;">
+            <h1 style="color:#ff4eb5; margin:0 0 5px 0; font-size:28px;">LAKAMI KIDS</h1>
+            <p style="margin:0; font-size:14px; color:#64748b;">Catálogo de Seleção - @lakami_kids | (82) 99381-7564</p>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px; justify-items:center;">
+            ${printHtml}
+        </div>
+    `;
+    
+    document.body.className = 'print-catalogo';
+    window.print();
+    document.body.className = '';
+    fecharCatalogo();
+};
+
+window.copiarCatalogoTextoDaModal = function() {
+    let txt = "✨ *CATÁLOGO LAKAMI KIDS* ✨\n_Disponível para entrega imediata_\n\n";
+    produtos.forEach(p => {
+        if(p.qtd > 0 && produtosSelecionadosCatalogo.has(p.id)) {
+            let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
+            let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
+            txt += `🛍️ *${p.nome}*\n📏 Tamanhos: ${tamanhosStr.join(', ')}\n💰 Valor: ${formatCurrency(p.venda)}\n\n`;
+        }
+    });
+    txt += "Peça já as fotografias detalhadas ou reserve o seu! 🥰\n📍 Instagram: @lakami_kids\n📲 WhatsApp: (82) 99381-7564";
+    
+    navigator.clipboard.writeText(txt).then(() => {
+        alert("✅ Catálogo em texto copiado com sucesso!\n\nBasta abrir o WhatsApp e colar a mensagem para a sua cliente.");
+        fecharModalAcoesCatalogo();
+        fecharCatalogo();
+    }).catch(err => alert("Erro ao copiar. O seu navegador pode ter bloqueado a ação."));
 };
 
 function atualizar(){
@@ -845,8 +1225,14 @@ function atualizar(){
     let painelAniv = el("painelAniversarios");
     if(painelAniv) {
         if(aniversariantes.length > 0) {
-            let txt = aniversariantes.map(c => `<span style="background:#fef9c3; padding:2px 6px; border-radius:4px; border:1px solid #fde047; margin-right:5px;">🎂 <b>${c.nome}</b> (${c.nasc.split('-')[2]}/${c.nasc.split('-')[1]})</span>`).join('');
-            painelAniv.innerHTML = `<div style="margin-bottom:8px;">🎉 <b>DICA DE CRM: Aniversariantes deste mês!</b> Aproveite para mandar um WhatsApp com 10% de desconto e fidelize:</div>${txt}`;
+            let txt = '<div style="display:flex; flex-wrap:wrap; gap:10px;">' + aniversariantes.map(c => 
+                `<div style="display:inline-flex; align-items:center; background:#fef9c3; padding:6px 10px; border-radius:6px; border:1px solid #fde047; gap:8px;">
+                    🎂 <b>${c.nome}</b> (${c.nasc.split('-')[2]}/${c.nasc.split('-')[1]}) 
+                    <button class="whatsapp btn-acao" onclick="enviarParabensWhatsApp(${c.id})" style="padding:0 10px; margin:0;" title="Enviar mensagem no WhatsApp"><span style="font-size:14px; margin-right:4px;">📲</span> Parabéns</button>
+                </div>`
+            ).join('') + '</div>';
+            
+            painelAniv.innerHTML = `<div style="margin-bottom:12px;">🎉 <b>DICA DE CRM: Aniversariantes deste mês!</b> Aproveite para mandar um WhatsApp de felicitação:</div>${txt}`;
             painelAniv.style.display = "block";
         } else {
             painelAniv.style.display = "none";
@@ -858,7 +1244,6 @@ function atualizar(){
         if (fData === "Tudo" || !dataStr) return true;
         let d = new Date(dataStr);
         if(isNaN(d)) return true;
-        
         let hoje = new Date();
         if (fData === "Hoje") { return d.getDate() === hoje.getDate() && d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear(); } 
         else if (fData === "Esta Semana") { let i = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - hoje.getDay()); return d >= i; } 
@@ -872,7 +1257,6 @@ function atualizar(){
         qtdEstoque += p.qtd;
         
         let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
-        
         let gradeHtmlStr = '<div style="display:flex; gap:5px; flex-wrap:wrap;">';
         Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) gradeHtmlStr += `<span style="background:#fdf2f8; color:#be185d; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; border:1px solid #fbcfe8;">${t}: ${gradeObj[t]}</span>`; });
         gradeHtmlStr += '</div>';
@@ -882,7 +1266,12 @@ function atualizar(){
         el("listaProd").innerHTML += `<tr>
             <td>${imgTag}</td><td style="font-weight:600; color:#334155; white-space:normal; min-width:150px;">${p.nome}</td><td style="white-space:normal; min-width:180px;">${gradeHtmlStr}</td>
             <td style="font-weight:900; font-size:16px; color:var(--primary);">${p.qtd}</td><td>${formatCurrency(p.compra)}</td><td>${formatCurrency(p.venda)}</td>
-            <td class="acoes-btn"><button onclick="editarProduto(${p.id})">E</button><button onclick="document.getElementById('fileProd-${p.id}').click()" style="background:#f472b6; color:#fff;" title="Trocar Foto">📷</button><input type="file" id="fileProd-${p.id}" style="display:none;" accept="image/*" onchange="uploadFotoDireta(event, ${p.id})"><button class="danger" onclick="excluirProduto(${p.id})">X</button></td>
+            <td class="acoes-btn">
+                <button class="btn-acao" onclick="editarProduto(${p.id})">Editar</button>
+                <button class="btn-acao" onclick="document.getElementById('fileProd-${p.id}').click()" style="background:#f472b6; color:#fff;" title="Trocar Foto">Foto</button>
+                <input type="file" id="fileProd-${p.id}" style="display:none;" accept="image/*" onchange="uploadFotoDireta(event, ${p.id})">
+                <button class="danger btn-acao-x" onclick="excluirProduto(${p.id})">X</button>
+            </td>
         </tr>`;
 
         let disabled = p.qtd <= 0;
@@ -902,37 +1291,51 @@ function atualizar(){
     });
 
     el("listaClientes").innerHTML = ""; el("selectCliente").innerHTML = '<option value="">Cliente Padrão (Avulso)</option>';
+    if(el("selectClienteCatalogo")) el("selectClienteCatalogo").innerHTML = '<option value="">Nenhum (Escolher direto no WhatsApp)</option>';
+
     clientes.forEach(c => { 
         let nascFormatado = c.nasc ? c.nasc.split('-').reverse().join('/') : '-';
         let credFormatado = c.credito ? formatCurrency(c.credito) : 'R$ 0,00';
-        el("listaClientes").innerHTML += `<tr><td>${c.nome}</td><td>${c.tel}</td><td>${nascFormatado}</td><td style="font-weight:bold; color:#166534;">${credFormatado}</td><td class="acoes-btn"><button onclick="editarCliente(${c.id})">E</button><button class="danger" onclick="excluirCliente(${c.id})">X</button></td></tr>`; 
+        el("listaClientes").innerHTML += `<tr>
+            <td>${c.nome}</td><td>${c.tel}</td><td>${nascFormatado}</td><td style="font-weight:bold; color:#166534;">${credFormatado}</td>
+            <td class="acoes-btn">
+                <button class="btn-acao" onclick="editarCliente(${c.id})">Editar</button>
+                <button class="danger btn-acao-x" onclick="excluirCliente(${c.id})">X</button>
+            </td>
+        </tr>`; 
         el("selectCliente").innerHTML += `<option value="${c.nome}">${c.nome}</option>`; 
+        if(el("selectClienteCatalogo")) el("selectClienteCatalogo").innerHTML += `<option value="${c.id}">${c.nome}</option>`;
     });
 
     el("listaFornecedores").innerHTML = "";
-    fornecedores.forEach(f => el("listaFornecedores").innerHTML += `<tr><td>${f.nome}</td><td>${f.contato}</td><td class="acoes-btn"><button onclick="editarFornecedor(${f.id})">E</button><button class="danger" onclick="excluirFornecedor(${f.id})">X</button></td></tr>`);
+    fornecedores.forEach(f => el("listaFornecedores").innerHTML += `<tr>
+        <td>${f.nome}</td><td>${f.contato}</td>
+        <td class="acoes-btn"><button class="btn-acao" onclick="editarFornecedor(${f.id})">Editar</button><button class="danger btn-acao-x" onclick="excluirFornecedor(${f.id})">X</button></td>
+    </tr>`);
 
     el("listaHistoricoCompras").innerHTML = "";
-    historicoCompras.forEach(c => el("listaHistoricoCompras").innerHTML += `<tr><td>${new Date(c.data).toLocaleDateString()}</td><td>${c.empresa}</td><td>${c.qtd}</td><td>${formatCurrency(c.valor)}</td><td>${formatCurrency(c.frete)}</td><td>${formatCurrency(c.valor+c.frete)}</td><td>${c.pagamento}</td><td class="acoes-btn"><button onclick="imprimirReciboCompra(${c.id})" style="background:#0284c7;">📄</button><button class="danger" onclick="excluirHistoricoCompra(${c.id})">X</button></td></tr>`);
+    historicoCompras.forEach(c => el("listaHistoricoCompras").innerHTML += `<tr>
+        <td>${new Date(c.data).toLocaleDateString()}</td><td>${c.empresa}</td><td>${c.qtd}</td><td>${formatCurrency(c.valor)}</td><td>${formatCurrency(c.frete)}</td><td>${formatCurrency(c.valor+c.frete)}</td><td>${c.pagamento}</td>
+        <td class="acoes-btn"><button class="btn-acao" onclick="imprimirReciboCompra(${c.id})" style="background:#0284c7;">Recibo</button><button class="danger btn-acao-x" onclick="excluirHistoricoCompra(${c.id})">X</button></td>
+    </tr>`);
     
     el("listaDespesas").innerHTML = "";
-    despesas.forEach(d => { if(checkFiltro(d.data)) { td += d.valor; } el("listaDespesas").innerHTML += `<tr><td>${new Date(d.data).toLocaleDateString()}</td><td style="white-space:normal;">${d.descricao}</td><td>${formatCurrency(d.valor)}</td><td class="acoes-btn"><button class="danger" onclick="excluirDespesa(${d.id})">X</button></td></tr>`; });
+    despesas.forEach(d => { if(checkFiltro(d.data)) { td += d.valor; } el("listaDespesas").innerHTML += `<tr>
+        <td>${new Date(d.data).toLocaleDateString()}</td><td style="white-space:normal;">${d.descricao}</td><td>${formatCurrency(d.valor)}</td>
+        <td class="acoes-btn"><button class="danger btn-acao-x" onclick="excluirDespesa(${d.id})">X</button></td>
+    </tr>`; });
 
     vendas.forEach(v => { 
-        if(v.status !== "Devolvido" && checkFiltro(v.data)){ 
-            vr += (v.total - (v.saldoDevedor || 0)); varc += (v.saldoDevedor || 0); cv += v.custoHistorico || 0; qtdVendidas += (v.quantidade || 1); 
-        } 
+        if(v.status !== "Devolvido" && checkFiltro(v.data)){ vr += (v.total - (v.saldoDevedor || 0)); varc += (v.saldoDevedor || 0); cv += v.custoHistorico || 0; qtdVendidas += (v.quantidade || 1); } 
     });
     
     let fTotal = vr + varc;
     el("qtdEstoque").children[0].innerText = qtdEstoque;
     el("qtdVendidas").children[0].innerText = qtdVendidas;
     el("saldoConta").children[0].innerText = formatCurrency(vr - td); 
-    
     el("investimento").children[0].innerText = formatCurrency(inv); el("valorEstoque").children[0].innerText = formatCurrency(est);
     el("receitas").children[0].innerText = formatCurrency(vr); el("vendasAReceber").children[0].innerText = formatCurrency(varc);
     el("despesas").children[0].innerText = formatCurrency(td);
-    
     el("lucro").children[0].innerText = fTotal > 0 ? (((fTotal - cv - td) / fTotal) * 100).toFixed(1) + "%" : "0%";
     el("margem").children[0].innerText = fTotal > 0 ? (((fTotal - cv) / fTotal) * 100).toFixed(1) + "%" : "0%";
 
@@ -952,16 +1355,17 @@ function atualizar(){
             <td style="color:${v.saldoDevedor>0?'red':'green'}">${formatCurrency(v.saldoDevedor || 0)}</td>
             <td><span class="lucro-tag">${formatCurrency(lVal)} (${lPor}%)</span></td><td>${infoForma}</td>
             <td class="acoes-btn">
-                ${(v.saldoDevedor>0 && v.status !== "Devolvido") ? `<button class="success" onclick="darBaixaVenda(${v.id})">💰 Baixar</button>`:''}
-                ${v.status !== "Devolvido" ? `<button class="warning" onclick="realizarTroca(${v.id})" title="Devolver e Gerar Vale-Crédito">🔄 Trocar</button>`:''}
-                <button onclick="imprimirRecibo(${v.id})" style="background:#0284c7;" title="Imprimir Recibo">📄</button>
-                <button class="danger" onclick="excluirVenda(${v.id})" title="Excluir Definitivamente">X</button>
+                ${(v.saldoDevedor>0 && v.status !== "Devolvido") ? `<button class="success btn-acao" onclick="darBaixaVenda(${v.id})">Baixar</button>`:''}
+                ${v.status !== "Devolvido" ? `<button class="warning btn-acao" onclick="realizarTroca(${v.id})" title="Devolver e Gerar Vale-Crédito">Trocar</button>`:''}
+                <button class="btn-acao" style="background:#0284c7;" onclick="abrirModalRecibo(${v.id})">Recibo</button>
+                <button class="danger btn-acao-x" onclick="excluirVenda(${v.id})" title="Excluir">X</button>
             </td>
         </tr>`;
     });
 }
 
-window.login=login; window.logout=logout; window.addProduto=addProduto; window.editarProduto=editarProduto; window.excluirProduto=excluirProduto; window.addCliente=addCliente; window.editarCliente=editarCliente; window.excluirCliente=excluirCliente; window.addFornecedor=addFornecedor; window.editarFornecedor=editarFornecedor; window.excluirFornecedor=excluirFornecedor; window.addHistoricoCompra=addHistoricoCompra; window.excluirHistoricoCompra=excluirHistoricoCompra; window.addDespesa=addDespesa; window.excluirDespesa=excluirDespesa; window.addCarrinho=addCarrinho; window.removerCarrinho=removerCarrinho; window.finalizarVenda=finalizarVenda; window.darBaixaVenda=darBaixaVenda; window.excluirVenda=excluirVenda; window.fechamentoCaixa=fechamentoCaixa; window.tratarRegrasPagamento=tratarRegrasPagamento; window.atualizarCarrinho=atualizarCarrinho; window.gerarRelatorio=gerarRelatorio; window.previewImage=previewImage; window.uploadFotoDireta=uploadFotoDireta; window.imprimirRecibo=imprimirRecibo; window.imprimirReciboCompra=imprimirReciboCompra; window.togglePDVDropdown=togglePDVDropdown; window.selecionarProdutoPDV=selecionarProdutoPDV; window.escolherTamanhoPDV=escolherTamanhoPDV; window.selecionarClientePDV=selecionarClientePDV; window.aplicarCreditoMaximo=aplicarCreditoMaximo; window.realizarTroca=realizarTroca; window.atualizar=atualizar;
+// LIGAÇÃO DE FUNÇÕES GLOBAIS
+window.login=login; window.logout=logout; window.addProduto=addProduto; window.editarProduto=editarProduto; window.excluirProduto=excluirProduto; window.addCliente=addCliente; window.editarCliente=editarCliente; window.excluirCliente=excluirCliente; window.addFornecedor=addFornecedor; window.editarFornecedor=editarFornecedor; window.excluirFornecedor=excluirFornecedor; window.addHistoricoCompra=addHistoricoCompra; window.excluirHistoricoCompra=excluirHistoricoCompra; window.addDespesa=addDespesa; window.excluirDespesa=excluirDespesa; window.addCarrinho=addCarrinho; window.removerCarrinho=removerCarrinho; window.finalizarVenda=finalizarVenda; window.darBaixaVenda=darBaixaVenda; window.excluirVenda=excluirVenda; window.fechamentoCaixa=fechamentoCaixa; window.tratarRegrasPagamento=tratarRegrasPagamento; window.atualizarCarrinho=atualizarCarrinho; window.gerarRelatorio=gerarRelatorio; window.previewImage=previewImage; window.uploadFotoDireta=uploadFotoDireta; window.imprimirRecibo=imprimirRecibo; window.imprimirReciboCompra=imprimirReciboCompra; window.togglePDVDropdown=togglePDVDropdown; window.selecionarProdutoPDV=selecionarProdutoPDV; window.escolherTamanhoPDV=escolherTamanhoPDV; window.selecionarClientePDV=selecionarClientePDV; window.aplicarCreditoMaximo=aplicarCreditoMaximo; window.realizarTroca=realizarTroca; window.enviarParabensWhatsApp=enviarParabensWhatsApp; window.enviarReciboWhatsApp=enviarReciboWhatsApp; window.abrirModalRecibo=abrirModalRecibo; window.fecharModalRecibo=fecharModalRecibo; window.dispararReciboWhatsApp=dispararReciboWhatsApp; window.dispararReciboPapel=dispararReciboPapel; window.abrirCatalogo=abrirCatalogo; window.fecharCatalogo=fecharCatalogo; window.toggleSelecaoCatalogo=toggleSelecaoCatalogo; window.selecionarTodosCatalogo=selecionarTodosCatalogo; window.limparSelecaoCatalogo=limparSelecaoCatalogo; window.abrirModalAcoesCatalogo=abrirModalAcoesCatalogo; window.fecharModalAcoesCatalogo=fecharModalAcoesCatalogo; window.enviarCatalogoWhatsApp=enviarCatalogoWhatsApp; window.imprimirCatalogoVisualEFechar=imprimirCatalogoVisualEFechar; window.copiarCatalogoTextoDaModal=copiarCatalogoTextoDaModal; window.atualizar=atualizar;
 </script>
 </body>
 </html>
