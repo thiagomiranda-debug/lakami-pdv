@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.10</title>
+<title>LAKAMI KIDS - Cloud PDV 3.11</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -166,16 +166,20 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 #modalAcoesCatalogo { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.7); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
 #modalAcoesCatalogo .card { width: 100%; max-width: 350px; text-align: center; border-radius: 16px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin:0 auto; }
 
-#reciboImpressao, #areaPrintCatalogo { display: none; }
+/* ÁREAS DE IMPRESSÃO - Escondidas inteligentemente para forçar carregamento das imagens */
+#reciboImpressao, #areaPrintCatalogo { 
+    position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; 
+}
 
 /* SISTEMA INTELIGENTE DE IMPRESSÃO */
 @media print {
     body * { visibility: hidden; }
+    
     body.print-recibo #reciboImpressao, body.print-recibo #reciboImpressao * { visibility: visible; }
-    body.print-recibo #reciboImpressao { position: absolute; left: 0; top: 0; width: 80mm; max-width: 100%; display: block; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; margin: 0; padding: 0 10px; }
+    body.print-recibo #reciboImpressao { position: absolute; left: 0; top: 0; width: 80mm; max-width: 100%; height: auto; opacity: 1; display: block; overflow: visible; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; margin: 0; padding: 0 10px; pointer-events: auto; }
     
     body.print-catalogo #areaPrintCatalogo, body.print-catalogo #areaPrintCatalogo * { visibility: visible; }
-    body.print-catalogo #areaPrintCatalogo { position: absolute; left: 0; top: 0; width: 100%; display: block; font-family: 'Roboto', sans-serif; background: #fff; }
+    body.print-catalogo #areaPrintCatalogo { position: absolute; left: 0; top: 0; width: 100%; height: auto; opacity: 1; display: block; overflow: visible; font-family: 'Roboto', sans-serif; background: #fff; pointer-events: auto; }
     
     .recibo-header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-top: 10px;}
     .recibo-header h2 { margin: 0 0 5px 0; font-size: 22px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;}
@@ -987,16 +991,10 @@ window.imprimirRecibo = function(id){
     ${v.saldoDevedor > 0 ? `<div class="linha" style="color:red; font-size:11px;"><span>Saldo Devedor (Fiado):</span> <span>${formatCurrency(v.saldoDevedor)}</span></div>` : ''}</div>
     <div class="recibo-footer"><p>Obrigado pela preferência!</p><p>Trocas em até 30 dias, com a etiqueta fixada na peça e sem marcas de uso.</p><p>Volte sempre! 🥰</p></div>`;
     
-    let area = el("reciboImpressao");
-    area.innerHTML = html;
-    area.style.display = 'block';
+    el("reciboImpressao").innerHTML = html;
     document.body.className = 'print-recibo';
-    
-    setTimeout(() => {
-        window.print();
-        document.body.className = '';
-        area.style.display = 'none';
-    }, 400);
+    window.print();
+    document.body.className = '';
 };
 
 window.imprimirReciboCompra = function(id){
@@ -1009,16 +1007,10 @@ window.imprimirReciboCompra = function(id){
     <div class="recibo-totais" style="margin-top: 15px;"><div class="linha"><span>Total de Peças:</span> <span>${c.qtd} unid.</span></div><div class="linha"><span>Valor dos Produtos:</span> <span>${formatCurrency(c.valor)}</span></div><div class="linha"><span>Valor do Frete:</span> <span>${formatCurrency(c.frete)}</span></div><div class="linha destaque"><span>CUSTO TOTAL:</span> <span>${formatCurrency(c.valor + c.frete)}</span></div><div class="linha" style="margin-top:6px; font-size:11px;"><span>Forma de Pagamento:</span> <span>${c.pagamento}</span></div></div>
     <div class="recibo-footer"><p>Documento de controlo interno de stock.</p></div>`;
     
-    let area = el("reciboImpressao");
-    area.innerHTML = html;
-    area.style.display = 'block';
+    el("reciboImpressao").innerHTML = html;
     document.body.className = 'print-recibo';
-    
-    setTimeout(() => {
-        window.print();
-        document.body.className = '';
-        area.style.display = 'none';
-    }, 400);
+    window.print();
+    document.body.className = '';
 };
 
 /* FUNÇÕES DO MODAL DE RECIBO E WHATSAPP */
@@ -1122,6 +1114,41 @@ function renderizarGridCatalogo() {
 
 window.abrirModalAcoesCatalogo = function() {
     if(produtosSelecionadosCatalogo.size === 0) return alert("Atenção: Primeiro, toque nos produtos que deseja enviar para os selecionar.");
+    
+    // GERA O HTML DA IMPRESSÃO NESTE EXATO MOMENTO (no "fundo", invisível).
+    // Isto dá tempo de sobra para o telemóvel renderizar as fotos antes de clicar no botão final.
+    let printHtml = '';
+    produtos.forEach(p => {
+        if(p.qtd > 0 && produtosSelecionadosCatalogo.has(p.id)) {
+            let imgTag = p.img ? `<img src="${p.img}" style="width:100%; height:200px; object-fit:contain; background:#f8fafc; border-radius:10px; margin-bottom:12px; border:1px solid #e2e8f0;">` : `<div style="width:100%; height:200px; background:#e2e8f0; border-radius:10px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:bold;">Sem Foto</div>`;
+            let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
+            let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
+            
+            // Adicionado break-inside: avoid para o produto não ser cortado na quebra de página do PDF
+            printHtml += `
+                <div style="border:1px solid #e2e8f0; border-radius:12px; padding:15px; text-align:center; background:#fff; break-inside: avoid; page-break-inside: avoid;">
+                    ${imgTag}
+                    <h4 style="margin:0 0 8px 0; color:#334155; font-size:16px;">${p.nome}</h4>
+                    <div style="color:#ff4eb5; font-weight:900; font-size:20px; margin-bottom:10px;">${formatCurrency(p.venda)}</div>
+                    <div style="font-size:13px; color:#64748b; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
+                        Disponível: <span style="font-weight:700; color:#475569;">${tamanhosStr.join(', ')}</span>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    let areaPrint = el("areaPrintCatalogo");
+    areaPrint.innerHTML = `
+        <div style="text-align:center; margin-bottom:30px; padding-bottom:15px; border-bottom:2px solid #f1f5f9;">
+            <h1 style="color:#ff4eb5; margin:0 0 5px 0; font-size:28px;">LAKAMI KIDS</h1>
+            <p style="margin:0; font-size:14px; color:#64748b;">Catálogo de Seleção - @lakami_kids | (82) 99381-7564</p>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px; justify-items:center;">
+            ${printHtml}
+        </div>
+    `;
+
     el("modalAcoesCatalogo").classList.remove("hidden");
 };
 
@@ -1165,48 +1192,13 @@ window.enviarCatalogoWhatsApp = function() {
 };
 
 window.imprimirCatalogoVisualEFechar = function() {
+    // Como tiramos o setTimeout, ele chama a janela de impressão diretamente
+    // Evitando ser bloqueado pelo telemóvel.
     fecharModalAcoesCatalogo();
-    
-    let printHtml = '';
-    produtos.forEach(p => {
-        if(p.qtd > 0 && produtosSelecionadosCatalogo.has(p.id)) {
-            let imgTag = p.img ? `<img src="${p.img}" style="width:100%; height:200px; object-fit:contain; background:#f8fafc; border-radius:10px; margin-bottom:12px; border:1px solid #e2e8f0;">` : `<div style="width:100%; height:200px; background:#e2e8f0; border-radius:10px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:bold;">Sem Foto</div>`;
-            let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
-            let tamanhosStr = []; Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) tamanhosStr.push(t); });
-            
-            printHtml += `
-                <div style="border:1px solid #e2e8f0; border-radius:12px; padding:15px; text-align:center; background:#fff;">
-                    ${imgTag}
-                    <h4 style="margin:0 0 8px 0; color:#334155; font-size:16px;">${p.nome}</h4>
-                    <div style="color:#ff4eb5; font-weight:900; font-size:20px; margin-bottom:10px;">${formatCurrency(p.venda)}</div>
-                    <div style="font-size:13px; color:#64748b; background:#f8fafc; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
-                        Disponível: <span style="font-weight:700; color:#475569;">${tamanhosStr.join(', ')}</span>
-                    </div>
-                </div>
-            `;
-        }
-    });
-
-    let areaPrint = el("areaPrintCatalogo");
-    areaPrint.innerHTML = `
-        <div style="text-align:center; margin-bottom:30px; padding-bottom:15px; border-bottom:2px solid #f1f5f9;">
-            <h1 style="color:#ff4eb5; margin:0 0 5px 0; font-size:28px;">LAKAMI KIDS</h1>
-            <p style="margin:0; font-size:14px; color:#64748b;">Catálogo de Seleção - @lakami_kids | (82) 99381-7564</p>
-        </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px; justify-items:center;">
-            ${printHtml}
-        </div>
-    `;
-    
-    areaPrint.style.display = 'block';
     document.body.className = 'print-catalogo';
-    
-    setTimeout(() => {
-        window.print();
-        document.body.className = '';
-        areaPrint.style.display = 'none';
-        fecharCatalogo();
-    }, 400);
+    window.print();
+    document.body.className = '';
+    fecharCatalogo();
 };
 
 window.copiarCatalogoTextoDaModal = function() {
