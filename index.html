@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.14</title>
+<title>LAKAMI KIDS - Cloud PDV 3.15</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -138,7 +138,6 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 
 #reciboImpressao { position: absolute; top: -9999px; z-index: -1000; opacity: 0; pointer-events: none; }
 
-/* Impressão apenas para recibos. O Catálogo agora gera nativo via jsPDF */
 @media print {
     body { display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important; height: auto !important; min-height: auto !important; overflow: visible !important; }
     .sidebar, .main-content, #loginOverlay, #modalRecibo, #modalAcoesCatalogo, #modalCatalogo { display: none !important; }
@@ -174,7 +173,7 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
         <input type="text" id="user" placeholder="Usuário">
         <input type="password" id="pass" placeholder="Senha">
         <button id="btnLogin" onclick="login()" style="padding: 15px; font-size: 16px; margin-top: 10px;">Entrar na Loja</button>
-        <p id="loginMsg" style="text-align:center; font-size:12px; color: #10b981; margin-top:10px; font-weight:700;"></p>
+        <p id="loginMsg" style="text-align:center; font-size:13px; color: #10b981; margin-top:15px; font-weight:700;"></p>
     </div>
 </div>
 
@@ -517,7 +516,7 @@ const resizeImage = (file, callback) => {
             canvas.width = width; canvas.height = height;
             let ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            callback(canvas.toDataURL('image/jpeg', 0.7)); // Qualidade 70% (Tira muito peso e mantém boa visualização)
+            callback(canvas.toDataURL('image/jpeg', 0.7));
         };
         img.src = e.target.result;
     };
@@ -536,14 +535,30 @@ let currentImgBase64 = "";
 let idVendaAtualRecibo = null; 
 let produtosSelecionadosCatalogo = new Set();
 
+/* SISTEMA DE CARREGAMENTO SEQUENCIAL COM RETRY (ANTI-ENGARRAFAMENTO) */
+async function fetchWithRetry(colName, displayNome, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            el("loginMsg").innerText = `A sincronizar: ${displayNome}...`;
+            const snap = await getDocs(collection(db, colName));
+            return snap.docs.map(d => d.data());
+        } catch (err) {
+            if (i === retries - 1) throw err;
+            el("loginMsg").innerText = `Falha em ${displayNome}. Tentando novamente (${i+1}/${retries})...`;
+            await new Promise(r => setTimeout(r, 1000)); // Espera 1 segundo antes de tentar de novo
+        }
+    }
+}
+
 async function puxarDadosNuvem() {
-    const fetchCol = async (n) => { const snap = await getDocs(collection(db, n)); return snap.docs.map(d => d.data()); };
-    const results = await Promise.all([
-        fetchCol("produtos"), fetchCol("clientes"), fetchCol("fornecedores"),
-        fetchCol("vendas"), fetchCol("despesas"), fetchCol("historicoCompras")
-    ]);
-    produtos = results[0]; clientes = results[1]; fornecedores = results[2];
-    vendas = results[3]; despesas = results[4]; historicoCompras = results[5];
+    // Agora descarrega um de cada vez. É mais leve para a internet móvel.
+    produtos = await fetchWithRetry("produtos", "Estoque de Produtos");
+    vendas = await fetchWithRetry("vendas", "Histórico de Vendas");
+    clientes = await fetchWithRetry("clientes", "Cadastro de Clientes");
+    fornecedores = await fetchWithRetry("fornecedores", "Fornecedores");
+    despesas = await fetchWithRetry("despesas", "Despesas da Loja");
+    historicoCompras = await fetchWithRetry("historicoCompras", "Entradas de Caixa");
+    el("loginMsg").innerText = `A preparar a loja...`;
 }
 
 async function salvarFirebase(col, item) { await setDoc(doc(db, col, item.id.toString()), item); }
@@ -564,7 +579,6 @@ window.login = async function(){
     if(el("user").value==="admin" && el("pass").value==="1234"){ 
         el("btnLogin").disabled = true; 
         el("loginMsg").style.color = "#f59e0b";
-        el("loginMsg").innerText = "A sincronizar dados da nuvem. Por favor aguarde...";
         
         try {
             await puxarDadosNuvem(); 
@@ -575,7 +589,7 @@ window.login = async function(){
             atualizar(); 
         } catch(e) {
             el("loginMsg").style.color = "#ef4444";
-            el("loginMsg").innerText = "Falha de ligação à internet. Tente novamente.";
+            el("loginMsg").innerText = "O sinal de internet falhou durante o processo. Por favor, tente novamente.";
             el("btnLogin").disabled = false;
         }
     } else alert("Acesso Negado.");
