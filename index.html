@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.15</title>
+<title>LAKAMI KIDS - Cloud PDV 3.16</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -483,7 +483,7 @@ th { background:#f8fafc; color: #64748b; font-weight: 600; white-space: nowrap; 
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAHwt8eGsCv2dnKAYQa0iaqWoHyGxl5V14",
@@ -496,6 +496,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// ATIVAÇÃO DO MOTOR DE CACHE NATIVO (Ignora lentidão da rede)
+try {
+    enableIndexedDbPersistence(db).catch((err) => {
+        console.warn("Atenção: Cache offline restrito neste navegador.", err);
+    });
+} catch(e) {}
 
 const formatCurrency = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 const el = (id) => document.getElementById(id);
@@ -535,7 +542,7 @@ let currentImgBase64 = "";
 let idVendaAtualRecibo = null; 
 let produtosSelecionadosCatalogo = new Set();
 
-/* SISTEMA DE CARREGAMENTO SEQUENCIAL COM RETRY (ANTI-ENGARRAFAMENTO) */
+/* SISTEMA DE CARREGAMENTO INTELIGENTE */
 async function fetchWithRetry(colName, displayNome, retries = 3) {
     for (let i = 0; i < retries; i++) {
         try {
@@ -544,14 +551,13 @@ async function fetchWithRetry(colName, displayNome, retries = 3) {
             return snap.docs.map(d => d.data());
         } catch (err) {
             if (i === retries - 1) throw err;
-            el("loginMsg").innerText = `Falha em ${displayNome}. Tentando novamente (${i+1}/${retries})...`;
-            await new Promise(r => setTimeout(r, 1000)); // Espera 1 segundo antes de tentar de novo
+            el("loginMsg").innerText = `Dados pesados! A tentar ${displayNome} novamente (${i+1}/${retries})...`;
+            await new Promise(r => setTimeout(r, 1500));
         }
     }
 }
 
 async function puxarDadosNuvem() {
-    // Agora descarrega um de cada vez. É mais leve para a internet móvel.
     produtos = await fetchWithRetry("produtos", "Estoque de Produtos");
     vendas = await fetchWithRetry("vendas", "Histórico de Vendas");
     clientes = await fetchWithRetry("clientes", "Cadastro de Clientes");
@@ -609,13 +615,16 @@ document.addEventListener("click", function(e){
 
 window.togglePDVDropdown = function() { el("pdvSelectList").classList.toggle('hidden'); };
 
-window.selecionarProdutoPDV = function(id, nome, img) {
-    el("selectProd").value = id; el("selectProdTam").value = ""; 
-    let imgHtml = img ? `<img src="${img}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;">` : `<div style="width:30px;height:30px;background:#e2e8f0;border-radius:4px;"></div>`;
-    el("pdvSelectDisplay").innerHTML = `<div style="display:flex;align-items:center;gap:10px;">${imgHtml} <b style="font-size:14px;">${nome}</b></div><span style="color:#999; font-size:12px">▼</span>`;
+/* BLINDAGEM DE MEMÓRIA (Nova versão usa ID no lugar de enviar a foto pelo HTML) */
+window.selecionarProdutoPDV = function(id) {
+    let p = produtos.find(x => x.id == id);
+    if(!p) return;
+    
+    el("selectProd").value = p.id; el("selectProdTam").value = ""; 
+    let imgHtml = p.img ? `<img src="${p.img}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;">` : `<div style="width:30px;height:30px;background:#e2e8f0;border-radius:4px;"></div>`;
+    el("pdvSelectDisplay").innerHTML = `<div style="display:flex;align-items:center;gap:10px;">${imgHtml} <b style="font-size:14px;">${p.nome}</b></div><span style="color:#999; font-size:12px">▼</span>`;
     el("pdvSelectList").classList.add("hidden");
 
-    let p = produtos.find(x => x.id == id);
     let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd };
     let htmlBotoes = '<div style="font-size:12px; font-weight:700; color:#475569; margin-bottom:8px;">2. Selecione o Tamanho Disponível:</div><div style="display:flex; gap:8px; flex-wrap:wrap;">';
     let temEstoque = false;
@@ -1255,7 +1264,9 @@ function atualizar(){
         el("listaProd").innerHTML += `<tr><td>${imgTag}</td><td style="font-weight:600; color:#334155; white-space:normal; min-width:150px;">${p.nome}</td><td style="white-space:normal; min-width:180px;">${gradeHtmlStr}</td><td style="font-weight:900; font-size:16px; color:var(--primary);">${p.qtd}</td><td>${formatCurrency(p.compra)}</td><td>${formatCurrency(p.venda)}</td>
             <td class="acoes-btn"><button class="btn-acao" onclick="editarProduto(${p.id})">Editar</button><button class="btn-acao" onclick="document.getElementById('fileProd-${p.id}').click()" style="background:#f472b6; color:#fff;" title="Trocar Foto">Foto</button><input type="file" id="fileProd-${p.id}" style="display:none;" accept="image/*" onchange="uploadFotoDireta(event, ${p.id})"><button class="danger btn-acao-x" onclick="excluirProduto(${p.id})">X</button></td></tr>`;
 
-        let disabled = p.qtd <= 0; let rowClass = disabled ? "select-item-row disabled" : "select-item-row"; let onclickAttr = disabled ? "" : `onclick="selecionarProdutoPDV(${p.id}, '${p.nome.replace(/'/g, "\\'")}', '${p.img || ''}')"`;
+        // Otimização Estrutural: A imagem pesada já não é enviada dentro do atributo HTML "onclick"
+        let disabled = p.qtd <= 0; let rowClass = disabled ? "select-item-row disabled" : "select-item-row"; 
+        let onclickAttr = disabled ? "" : `onclick="selecionarProdutoPDV(${p.id})"`;
         let stockColor = disabled ? '#ef4444' : '#10b981'; let stockText = disabled ? 'Esgotado' : `${p.qtd} unid em Estoque`; let imgSmall = p.img ? `<img src="${p.img}">` : `<div class="select-item-placeholder">Sem<br>Foto</div>`;
         el("pdvSelectList").innerHTML += `<div class="${rowClass}" ${onclickAttr}>${imgSmall}<div style="flex:1"><div style="font-weight:700; font-size:15px; color:#334155;">${p.nome}</div><div style="font-size:12px; color:${stockColor}; font-weight:600; margin-top:3px;">${stockText}</div></div><div style="font-weight:900; color:var(--primary); font-size:16px;">${formatCurrency(p.venda)}</div></div>`;
     });
