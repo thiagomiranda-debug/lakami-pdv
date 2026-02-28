@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>LAKAMI KIDS - Cloud PDV 3.16</title>
+<title>LAKAMI KIDS - Cloud PDV 3.17</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -615,7 +615,6 @@ document.addEventListener("click", function(e){
 
 window.togglePDVDropdown = function() { el("pdvSelectList").classList.toggle('hidden'); };
 
-/* BLINDAGEM DE MEMÓRIA (Nova versão usa ID no lugar de enviar a foto pelo HTML) */
 window.selecionarProdutoPDV = function(id) {
     let p = produtos.find(x => x.id == id);
     if(!p) return;
@@ -1254,17 +1253,27 @@ function atualizar(){
         return true;
     };
     
-    produtos.forEach(p => {
+    // ORDENAÇÃO INTELIGENTE DA VERSÃO 3.17: Produtos esgotados vão para o fim da lista
+    let produtosOrdenados = [...produtos].sort((a, b) => {
+        let aEsgotado = a.qtd <= 0 ? 1 : 0;
+        let bEsgotado = b.qtd <= 0 ? 1 : 0;
+        return aEsgotado - bEsgotado;
+    });
+    
+    produtosOrdenados.forEach(p => {
         inv += p.compra * p.qtd; est += p.venda * p.qtd; qtdEstoque += p.qtd;
         let gradeObj = p.grade || { [p.tam || 'Único']: p.qtd }; let gradeHtmlStr = '<div style="display:flex; gap:5px; flex-wrap:wrap;">';
         Object.keys(gradeObj).forEach(t => { if(gradeObj[t] > 0) gradeHtmlStr += `<span style="background:#fdf2f8; color:#be185d; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; border:1px solid #fbcfe8;">${t}: ${gradeObj[t]}</span>`; });
         gradeHtmlStr += '</div>'; if(p.qtd <= 0) gradeHtmlStr = `<span style="color:#ef4444; font-size:12px; font-weight:bold;">Totalmente Esgotado</span>`;
 
         let imgTag = p.img ? `<img src="${p.img}" style="width:70px;height:70px;border-radius:8px;object-fit:cover; border:1px solid #e2e8f0;">` : "Sem Foto";
-        el("listaProd").innerHTML += `<tr><td>${imgTag}</td><td style="font-weight:600; color:#334155; white-space:normal; min-width:150px;">${p.nome}</td><td style="white-space:normal; min-width:180px;">${gradeHtmlStr}</td><td style="font-weight:900; font-size:16px; color:var(--primary);">${p.qtd}</td><td>${formatCurrency(p.compra)}</td><td>${formatCurrency(p.venda)}</td>
+        
+        // Estilo visual (Linha Cinza e Transparente) para Esgotados
+        let linhaStyle = p.qtd <= 0 ? "background:#f1f5f9; opacity:0.65; transition:0.3s;" : "transition:0.3s;";
+
+        el("listaProd").innerHTML += `<tr style="${linhaStyle}"><td>${imgTag}</td><td style="font-weight:600; color:#334155; white-space:normal; min-width:150px;">${p.nome}</td><td style="white-space:normal; min-width:180px;">${gradeHtmlStr}</td><td style="font-weight:900; font-size:16px; color:var(--primary);">${p.qtd}</td><td>${formatCurrency(p.compra)}</td><td>${formatCurrency(p.venda)}</td>
             <td class="acoes-btn"><button class="btn-acao" onclick="editarProduto(${p.id})">Editar</button><button class="btn-acao" onclick="document.getElementById('fileProd-${p.id}').click()" style="background:#f472b6; color:#fff;" title="Trocar Foto">Foto</button><input type="file" id="fileProd-${p.id}" style="display:none;" accept="image/*" onchange="uploadFotoDireta(event, ${p.id})"><button class="danger btn-acao-x" onclick="excluirProduto(${p.id})">X</button></td></tr>`;
 
-        // Otimização Estrutural: A imagem pesada já não é enviada dentro do atributo HTML "onclick"
         let disabled = p.qtd <= 0; let rowClass = disabled ? "select-item-row disabled" : "select-item-row"; 
         let onclickAttr = disabled ? "" : `onclick="selecionarProdutoPDV(${p.id})"`;
         let stockColor = disabled ? '#ef4444' : '#10b981'; let stockText = disabled ? 'Esgotado' : `${p.qtd} unid em Estoque`; let imgSmall = p.img ? `<img src="${p.img}">` : `<div class="select-item-placeholder">Sem<br>Foto</div>`;
